@@ -67,7 +67,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>📋 Gerador de Carimbo</h1>
+      <h1>📋 Gerador de Carimbo - RS-CAPITAL</h1>
       <p>Sistema de Acionamento - GPON - Vivo Rede</p>
     </div>
 
@@ -88,6 +88,13 @@
 
       <div class="section">
         <div class="section-title">ACIONAMENTO</div>
+
+        <div class="form-group full">
+          <div>
+            <label>ID Ocorrência</label>
+            <input type="text" id="id_ocorrencia" placeholder="Ex: OCR-2024-001">
+          </div>
+        </div>
 
         <div class="form-group">
           <div>
@@ -129,11 +136,29 @@
 
           <div>
             <label>Nome SITE/ARO para medições</label>
-            <input type="text" id="acionamento_site" list="siteList" placeholder="Ex: PON-001, ARO-05">
+            <input type="text" id="acionamento_site" list="siteList" placeholder="Digite para pesquisar ou selecione na lista">
             <datalist id="siteList">
-              <option value="PON-001"></option>
-              <option value="ARO-05"></option>
-              <option value="CTO-123"></option>
+              <option value="RSCBM_G1N01"></option>
+              <option value="RSCBM_O1A01"></option>
+              <option value="RSCQU_G1I01"></option>
+              <option value="RSGUB_G1N01"></option>
+              <option value="RSPAE_G1B95"></option>
+              <option value="RSPAE_G1C01"></option>
+              <option value="RSPAE_G1I22"></option>
+              <option value="RSPAE_G1I23"></option>
+              <option value="RSPAE_G1I24"></option>
+              <option value="RSPAE_G1I25"></option>
+              <option value="RSPAE_G1I26"></option>
+              <option value="RSPAE_G1I32"></option>
+              <option value="RSPAE_G1I33"></option>
+              <option value="RSPAE_G1I35"></option>
+              <option value="RSPAE_G1I41"></option>
+              <option value="RSPAE_G1I47"></option>
+              <option value="RSPAE_G1I48"></option>
+              <option value="RSPAE_G1I55"></option>
+              <option value="RSPAE_G1N42"></option>
+              <option value="RSPAE_G1N45"></option>
+              <option value="RSSLE_O1A04"></option>
             </datalist>
           </div>
         </div>
@@ -145,12 +170,7 @@
           </div>
         </div>
 
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia" placeholder="Ex: OCR-2024-001">
-          </div>
-        </div>
+        
 
         <div class="actions">
           <button class="btn-generate" onclick="generateStamp('tab1')">Gerar Carimbo</button>
@@ -213,6 +233,13 @@
 
       <div class="section">
         <div class="section-title">DESLOCAMENTO AO PONTO DA FALHA</div>
+        <div class="form-group full">
+          <div>
+            <label>ID Ocorrência</label>
+            <input type="text" id="id_ocorrencia2" placeholder="Ex: OCR-2024-001" readonly>
+          </div>
+        </div>
+
 
         <div class="form-group">
           <div>
@@ -236,12 +263,7 @@
           </div>
         </div>
 
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia2" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
+        
 
         <div class="form-group">
           <div>
@@ -281,6 +303,13 @@
 
       <div class="section">
         <div class="section-title">RECUPERAÇÃO DA FALHA</div>
+        <div class="form-group full">
+          <div>
+            <label>ID Ocorrência</label>
+            <input type="text" id="id_ocorrencia3" placeholder="Ex: OCR-2024-001" readonly>
+          </div>
+        </div>
+
 
         <div class="form-group">
           <div>
@@ -304,12 +333,7 @@
           </div>
         </div>
 
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia3" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
+        
 
         <div class="form-group">
           <div>
@@ -420,6 +444,13 @@
 
       <div class="section">
         <div class="section-title">SOLICITAÇÃO DE CERTIFICAÇÃO</div>
+        <div class="form-group full">
+          <div>
+            <label>ID Ocorrência</label>
+            <input type="text" id="id_ocorrencia4" placeholder="Ex: OCR-2024-001" readonly>
+          </div>
+        </div>
+
 
         <div class="form-group">
           <div>
@@ -443,12 +474,7 @@
           </div>
         </div>
 
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia4" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
+        
 
         <div class="form-group full">
           <div>
@@ -495,6 +521,13 @@
 
       <div class="section">
         <div class="section-title">NÃO HÁ FALHA PARA REDE</div>
+        <div class="form-group full">
+          <div>
+            <label>ID Ocorrência</label>
+            <input type="text" id="id_ocorrencia5" placeholder="Ex: OCR-2024-001" readonly>
+          </div>
+        </div>
+
 
         <div class="form-group">
           <div>
@@ -518,12 +551,7 @@
           </div>
         </div>
 
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia5" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
+        
 
         <div class="form-group full">
           <div>
@@ -542,7 +570,7 @@
           </div>
           <div>
             <label>Ciente (Gestor VIVO Rede)</label>
-            <input type="text" id="naofalha_gestor" placeholder="Nome do Gestor">
+            <input type="text" id="naofalha_gestor" value="João Andrioli" readonly>
           </div>
         </div>
 
@@ -755,6 +783,7 @@
 
         stamp = `
 1 – ACIONAMENTO
+ID Ocorrência: ${idOcorrencia}
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -765,9 +794,7 @@ Telefone: ${tecnicoTel}
 Previsão de chegada ao SITE/ARO para medições: ${prevChegada}
 Nome SITE/ARO para medições: ${site}
 
-Analista CCR: ${analista}
-ID Ocorrência: ${idOcorrencia}
-`.trim();
+Analista CCR: ${analista}`.trim();
 
       } else if (tabName === "tab1b") {
         const idOcorrencia = document.getElementById("id_ocorrencia1b").value;
@@ -779,14 +806,13 @@ ID Ocorrência: ${idOcorrencia}
 
         stamp = `
 ESCALONAMENTO SEM EQUIPE
-
 ID Ocorrência: ${idOcorrencia}
+
 Cargo: ${cargo}
 Nome/Tel.: ${nomeTel}
 SLA do evento: ${sla}
 Obs.: ${obs}
-Analista CCR: ${analista}
-`.trim();
+Analista CCR: ${analista}`.trim();
 
       } else if (tabName === "tab2") {
         const supervisor = document.getElementById("supervisor2").value;
@@ -802,6 +828,7 @@ Analista CCR: ${analista}
 
         stamp = `
 2 – DESLOCAMENTO AO PONTO DA FALHA
+ID Ocorrência: ${idOcorrencia}
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -809,13 +836,11 @@ Telefone: ${supervisorTel}
 TÉCNICO: ${tecnico}
 Telefone: ${tecnicoTel}
 
-ID Ocorrência: ${idOcorrencia}
 KM até o LOCAL da falha: ${km} km
 Previsão de chegada ao LOCAL da falha: ${prevChegada}
 
 Obs.: ${obs}
-Analista CCR: ${analista}
-`.trim();
+Analista CCR: ${analista}`.trim();
 
       } else if (tabName === "tab3") {
         const supervisor = document.getElementById("supervisor3").value;
@@ -834,6 +859,7 @@ Analista CCR: ${analista}
 
         stamp = `
 3 – RECUPERAÇÃO DA FALHA
+ID Ocorrência: ${idOcorrencia}
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -841,7 +867,6 @@ Telefone: ${supervisorTel}
 TÉCNICO: ${tecnico}
 Telefone: ${tecnicoTel}
 
-ID Ocorrência: ${idOcorrencia}
 Causa raiz: ${causa}
 Previsão para solicitação de testes: ${prevTestes}
 Endereço da falha: ${endereco}
@@ -850,8 +875,7 @@ Cabo/Capacidade/ARO: ${cabo}
 Tratativas realizadas: ${tratativas}
 
 Obs.: ${obs}
-Analista CCR: ${analista}
-`.trim();
+Analista CCR: ${analista}`.trim();
 
       } else if (tabName === "tab3b") {
         const idOcorrencia = document.getElementById("id_ocorrencia3b").value;
@@ -863,14 +887,13 @@ Analista CCR: ${analista}
 
         stamp = `
 3B – COMPLEMENTAR
-
 ID Ocorrência: ${idOcorrencia}
+
 Motivo: ${motivo}
 Informação: ${info}
 Nova previsão: ${novaPrevisao}
 Previsão: ${previsao}
-Analista CCR: ${analista}
-`.trim();
+Analista CCR: ${analista}`.trim();
 
       } else if (tabName === "tab4") {
         const supervisor = document.getElementById("supervisor4").value;
@@ -887,6 +910,7 @@ Analista CCR: ${analista}
 
         stamp = `
 4 – SOLICITAÇÃO DE CERTIFICAÇÃO
+ID Ocorrência: ${idOcorrencia}
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -894,13 +918,11 @@ Telefone: ${supervisorTel}
 TÉCNICO: ${tecnico}
 Telefone: ${tecnicoTel}
 
-ID Ocorrência: ${idOcorrencia}
 Tratativa realizada: ${tratativa}
 Causa: ${causa}
 Material utilizado: ${material}
 Foto em anexo: ${foto}
-Analista CCR: ${analista}
-`.trim();
+Analista CCR: ${analista}`.trim();
 
       } else if (tabName === "tab5") {
         const supervisor = document.getElementById("supervisor5").value;
@@ -921,6 +943,7 @@ Analista CCR: ${analista}
 
         stamp = `
 NÃO HÁ FALHA PARA REDE
+ID Ocorrência: ${idOcorrencia}
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -928,7 +951,6 @@ Telefone: ${supervisorTel}
 TÉCNICO: ${tecnico}
 Telefone: ${tecnicoTel}
 
-ID Ocorrência: ${idOcorrencia}
 Motivo da improdutiva: ${motivo}
 Foto em anexo: ${foto}
 Ciente (Gestor VIVO Rede): ${gestor}
@@ -938,8 +960,7 @@ ESCALONAMENTO PRAZO REPARO
 Cargo: ${cargo}
 Nome/Tel.: ${nomeTel}
 SLA do evento: ${sla}
-Obs.: ${obs}
-`.trim();
+Obs.: ${obs}`.trim();
 
       } else if (tabName === "tab6") {
         const idOcorrencia = document.getElementById("id_ocorrencia6").value;
@@ -952,8 +973,8 @@ Obs.: ${obs}
 
         stamp = `
 INTERVENÇÃO CIRE
-
 ID Ocorrência: ${idOcorrencia}
+
 Solicitante: ${solicitante}
 Meio de contato: ${contato}
 
@@ -961,8 +982,7 @@ Motivo: ${motivo}
 Informação: ${info}
 
 Previsão: ${previsao}
-Analista CCR: ${analista}
-`.trim();
+Analista CCR: ${analista}`.trim();
       }
 
       document.getElementById("outputText").textContent = stamp;
@@ -990,8 +1010,10 @@ Analista CCR: ${analista}
     }
 
     function clearTab(tabName) {
-      const inputs = document.querySelectorAll(`#${tabName} input, #${tabName} textarea`);
+      const inputs = document.querySelectorAll(`#${tabName} input, #${tabName} textarea, #${tabName} select`);
       inputs.forEach(input => {
+        // Não limpar campos fixos (readonly/disabled) como ID replicado e Gestor
+        if (input.readOnly || input.disabled) return;
         if (input.type === "radio" || input.type === "checkbox") {
           input.checked = false;
         } else {
