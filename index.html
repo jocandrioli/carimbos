@@ -11,33 +11,24 @@
     .header { background: #003366; color: #fff; padding: 20px; text-align: center; }
     .header h1 { font-size: 24px; margin-bottom: 5px; }
     .header p { font-size: 12px; opacity: .9; }
-    .tabs { display: flex; flex-wrap: wrap; background: #004d99; border-bottom: 3px solid #003366; }
-    .tab-btn { flex: 1; min-width: 140px; padding: 12px; background: #004d99; color: #fff; border: 0; cursor: pointer; font-weight: 700; font-size: 12px; transition: .3s; text-align: center; }
-    .tab-btn:hover { background: #003366; }
-    .tab-btn.active { background: #ff6600; border-bottom: 4px solid #ff6600; }
-    .content { padding: 20px; display: none; animation: fadeIn .25s; }
-    .content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .reuse-note { background: #e8f4f8; border-left: 4px solid #0066cc; padding: 10px; margin-bottom: 15px; font-size: 11px; color: #003366; }
-    .section { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; }
-    .section-title { font-weight: 700; color: #003366; margin-bottom: 12px; font-size: 14px; border-bottom: 2px solid #ff6600; padding-bottom: 8px; }
-
     .form-group { margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-group.full { grid-template-columns: 1fr; }
     .form-group.three-col { grid-template-columns: 1fr 1fr 1fr; }
-
     label { display: block; font-size: 12px; font-weight: 700; color: #333; margin-bottom: 4px; }
     input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], textarea, select {
       width: 100%; padding: 8px; border: 1px solid #999; border-radius: 4px; font-size: 12px; font-family: Arial, sans-serif;
     }
     textarea { resize: vertical; min-height: 60px; }
     input:focus, textarea:focus, select:focus { outline: none; border-color: #ff6600; background: #fffef0; }
-
+    .section { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; }
+    .section-title { font-weight: 700; color: #003366; margin-bottom: 12px; font-size: 14px; border-bottom: 2px solid #ff6600; padding-bottom: 8px; }
+    .header-section { background: #f9f9f9; padding: 20px; border-bottom: 2px solid #004d99; }
+    .header-section h2 { color: #003366; font-size: 16px; margin-bottom: 15px; }
+    .dynamic-content { padding: 20px; display: none; }
+    .dynamic-content.active { display: block; }
     .checkbox-group { display: flex; gap: 15px; margin-top: 8px; }
     .checkbox-group label { display: inline-flex; align-items: center; margin-bottom: 0; font-weight: 600; }
     .checkbox-group input[type="checkbox"], .checkbox-group input[type="radio"] { width: auto; margin-right: 6px; }
-
     .actions { display: flex; gap: 10px; margin-top: 20px; justify-content: space-between; flex-wrap: wrap; }
     button { padding: 10px 20px; font-size: 12px; border: 0; border-radius: 4px; cursor: pointer; font-weight: 700; transition: .3s; }
     .btn-generate { background: #ff6600; color: #fff; flex: 1; min-width: 120px; }
@@ -46,18 +37,15 @@
     .btn-copy:hover { background: #0052a3; }
     .btn-clear { background: #999; color: #fff; flex: 1; min-width: 120px; }
     .btn-clear:hover { background: #777; }
-
     .output-section { margin-top: 20px; padding: 15px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: none; }
     .output-section.active { display: block; }
     .output-section h3 { color: #003366; margin-bottom: 10px; font-size: 14px; }
     .output-text { background: #fff; padding: 12px; border: 1px solid #999; border-radius: 4px; font-family: "Courier New", monospace; font-size: 11px; line-height: 1.6; color: #333; max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
     .success-message { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 12px; display: none; }
     .success-message.show { display: block; }
-
     @media (max-width: 768px) {
       .form-group { grid-template-columns: 1fr; }
       .form-group.three-col { grid-template-columns: 1fr; }
-      .tab-btn { min-width: 110px; font-size: 11px; padding: 10px; }
       .actions { flex-direction: column; }
       button { width: 100%; }
     }
@@ -71,69 +59,97 @@
       <p>Sistema de Acionamento - GPON - Vivo Rede</p>
     </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('tab1', event)">ACIONAMENTO</button>
-      <button class="tab-btn" onclick="switchTab('tab2', event)">DESLOCAMENTO</button>
-      <button class="tab-btn" onclick="switchTab('tab3', event)">RECUPERAÇÃO</button>
-      <button class="tab-btn" onclick="switchTab('tab4', event)">CERTIFICAÇÃO</button>
-      <button class="tab-btn" onclick="switchTab('tab3b', event)">COMPLEMENTAR</button>
-      <button class="tab-btn" onclick="switchTab('tab5', event)">NÃO HÁ FALHA</button>
-      <button class="tab-btn" onclick="switchTab('tab6', event)">CIRE</button>
-      <button class="tab-btn" onclick="switchTab('tab1b', event)">ESC. SEM EQUIPE</button>
+    <div class="header-section">
+      <h2>Dados Gerais (Preenchidos para todos os carimbos)</h2>
+
+      <div class="form-group">
+        <div>
+          <label>ID Ocorrência</label>
+          <input type="text" id="id_ocorrencia" placeholder="Ex: 123456">
+        </div>
+        <div>
+          <label>Selecione o Tipo de Carimbo</label>
+          <select id="carimbo_tipo">
+            <option value="">-- Selecione --</option>
+            <option value="acionamento">1. Acionamento</option>
+            <option value="deslocamento">2. Deslocamento ao Ponto da Falha</option>
+            <option value="recuperacao">3. Recuperação da Falha</option>
+            <option value="certificacao">4. Certificação</option>
+            <option value="complementar">3B. Complementar</option>
+            <option value="naofalha">5. Não há Falha para Rede</option>
+            <option value="transbordo">Transbordo</option>
+            <option value="prazo">Prazo de Reparo</option>
+            <option value="cire">CIRE</option>
+            <option value="escalonamento">Escalonamento sem Equipe</option>
+            <option value="cto_defeito">CTO com Defeito</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div>
+          <label>SUPERVISOR</label>
+          <input type="text" id="supervisor" list="supervisorList" placeholder="Nome do Supervisor">
+          <datalist id="supervisorList">
+            <option value="Alexandre Ilha"></option>
+            <option value="Diego Jaworski"></option>
+            <option value="Diego Richter"></option>
+            <option value="Marcio Mendes"></option>
+            <option value="Mário Pereira"></option>
+            <option value="Rodrigo Duarte"></option>
+            <option value="Rodrigo Rosa"></option>
+          </datalist>
+        </div>
+        <div>
+          <label>Telefone Supervisor</label>
+          <input type="tel" id="supervisor_tel" placeholder="(51) 9XXXX-XXXX">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div>
+          <label>TÉCNICO</label>
+          <input type="text" id="tecnico" placeholder="Nome do Técnico">
+        </div>
+        <div>
+          <label>Telefone Técnico</label>
+          <input type="tel" id="tecnico_tel" placeholder="(51) 9XXXX-XXXX">
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <div>
+          <label>Analista CCR</label>
+          <input type="text" id="analista_ccr" list="analistaList" placeholder="Digite para pesquisar ou selecione na lista">
+          <datalist id="analistaList">
+            <option value="CARINA DE FATIMA CHUQUEL"></option>
+            <option value="EDMILSON GARCIA RIEIRA"></option>
+            <option value="EDUARDA PAIVA RODRIGUES"></option>
+            <option value="JULIA DOS SANTOS DA SILVA"></option>
+            <option value="MATHEUS ALVES CASTRO"></option>
+            <option value="RAFAELA VERCH DIAS"></option>
+            <option value="SILVIO LUIZ RACHOR PUTRIQUE"></option>
+          </datalist>
+        </div>
+      </div>
     </div>
 
-    <!-- TAB 1 -->
-    <div id="tab1" class="content active">
-      <div class="reuse-note">Os dados de SUPERVISOR/tel., TÉCNICO/tel. e ID Ocorrência são reutilizados automaticamente em outros carimbos.</div>
+    <div class="dynamic-content active" id="content-default">
+      <div class="section">
+        <p style="color: #666; text-align: center; padding: 40px 20px;">
+          Selecione um tipo de carimbo acima para ver os campos específicos.
+        </p>
+      </div>
+    </div>
 
+    <div class="dynamic-content" id="content-acionamento">
       <div class="section">
         <div class="section-title">ACIONAMENTO</div>
-
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia" placeholder="Ex: OCR-2024-001">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>SUPERVISOR</label>
-            <input type="text" id="supervisor" list="supervisorList" placeholder="Nome do Supervisor">
-            <datalist id="supervisorList">
-              <option value="Alexandre Ilha"></option>
-              <option value="Diego Jaworski"></option>
-              <option value="Diego Richter"></option>
-              <option value="Marcio Mendes"></option>
-              <option value="Mário Pereira"></option>
-              <option value="Rodrigo Duarte"></option>
-              <option value="Rodrigo Rosa"></option>
-            </datalist>
-          </div>
-
-          <div>
-            <label>Telefone Supervisor</label>
-            <input type="tel" id="supervisor_tel" placeholder="(51) 9XXXX-XXXX">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>TÉCNICO</label>
-            <input type="text" id="tecnico" placeholder="Nome do Técnico">
-          </div>
-          <div>
-            <label>Telefone Técnico</label>
-            <input type="tel" id="tecnico_tel" placeholder="(51) 9XXXX-XXXX">
-          </div>
-        </div>
-
         <div class="form-group">
           <div>
             <label>Previsão de chegada ao SITE/ARO para medições</label>
             <input type="time" id="acionamento_prev_chegada">
           </div>
-
           <div>
             <label>Nome SITE/ARO para medições</label>
             <input type="text" id="acionamento_site" list="siteList" placeholder="Digite para pesquisar ou selecione na lista">
@@ -162,109 +178,16 @@
             </datalist>
           </div>
         </div>
-
-        <div class="form-group full">
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="acionamento_analista" placeholder="Nome do Analista">
-          </div>
-        </div>
-
-        
-
         <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab1')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab1')">Limpar Formulário</button>
+          <button class="btn-generate" onclick="generateStamp('acionamento')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 1B -->
-    <div id="tab1b" class="content">
-      <div class="section">
-        <div class="section-title">ESCALONAMENTO SEM EQUIPE</div>
-
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia1b" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>Cargo</label>
-            <input type="text" id="escalonamento_cargo" placeholder="Ex: Coordenador, Supervisor">
-          </div>
-          <div>
-            <label>Nome / Telefone</label>
-            <input type="text" id="escalonamento_nome_tel" placeholder="Nome e telefone">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>SLA do evento</label>
-            <input type="text" id="escalonamento_sla" placeholder="Ex: 4h, 2h">
-          </div>
-          <div>
-            <label>Observações</label>
-            <input type="text" id="escalonamento_obs" placeholder="Observações">
-          </div>
-        </div>
-
-        <div class="form-group full">
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="escalonamento_analista" placeholder="Nome do Analista">
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab1b')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab1b')">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 2 -->
-    <div id="tab2" class="content">
-      <div class="reuse-note">SUPERVISOR/tel., TÉCNICO/tel. e ID Ocorrência já estão preenchidos automaticamente.</div>
-
+    <div class="dynamic-content" id="content-deslocamento">
       <div class="section">
         <div class="section-title">DESLOCAMENTO AO PONTO DA FALHA</div>
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia2" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
-
-
-        <div class="form-group">
-          <div>
-            <label>SUPERVISOR</label>
-            <input type="text" id="supervisor2" placeholder="Nome do Supervisor" readonly>
-          </div>
-          <div>
-            <label>Telefone Supervisor</label>
-            <input type="tel" id="supervisor_tel2" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>TÉCNICO</label>
-            <input type="text" id="tecnico2" placeholder="Nome do Técnico" readonly>
-          </div>
-          <div>
-            <label>Telefone Técnico</label>
-            <input type="tel" id="tecnico_tel2" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        
-
         <div class="form-group">
           <div>
             <label>KM até o LOCAL da falha</label>
@@ -275,77 +198,46 @@
             <input type="time" id="deslocamento_prev_chegada">
           </div>
         </div>
-
         <div class="form-group full">
           <div>
             <label>Observações</label>
             <textarea id="deslocamento_obs" placeholder="Observações sobre o deslocamento"></textarea>
           </div>
         </div>
-
-        <div class="form-group full">
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="deslocamento_analista" placeholder="Nome do Analista">
-          </div>
-        </div>
-
         <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab2')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab2')">Limpar Formulário</button>
+          <button class="btn-generate" onclick="generateStamp('deslocamento')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3 -->
-    <div id="tab3" class="content">
-      <div class="reuse-note">SUPERVISOR/tel., TÉCNICO/tel. e ID Ocorrência já estão preenchidos automaticamente.</div>
-
+    <div class="dynamic-content" id="content-recuperacao">
       <div class="section">
         <div class="section-title">RECUPERAÇÃO DA FALHA</div>
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia3" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
-
-
-        <div class="form-group">
-          <div>
-            <label>SUPERVISOR</label>
-            <input type="text" id="supervisor3" placeholder="Nome do Supervisor" readonly>
-          </div>
-          <div>
-            <label>Telefone Supervisor</label>
-            <input type="tel" id="supervisor_tel3" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>TÉCNICO</label>
-            <input type="text" id="tecnico3" placeholder="Nome do Técnico" readonly>
-          </div>
-          <div>
-            <label>Telefone Técnico</label>
-            <input type="tel" id="tecnico_tel3" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        
-
         <div class="form-group">
           <div>
             <label>Causa raiz</label>
-            <textarea id="recuperacao_causa" placeholder="Descrição da causa raiz"></textarea>
+            <select id="recuperacao_causa">
+              <option value="" disabled selected>Selecione</option>
+              <option value="Abalroamento">Abalroamento</option>
+              <option value="Furto">Furto</option>
+              <option value="Acidente">Acidente</option>
+              <option value="Descarga">Descarga</option>
+              <option value="Vandalismo">Vandalismo</option>
+              <option value="Troca de poste">Troca de poste</option>
+              <option value="Degradação / Infiltração">Degradação / Infiltração</option>
+              <option value="Defeito Splitter">Defeito Splitter</option>
+              <option value="Falha em atividade anterior">Falha em atividade anterior</option>
+              <option value="Obra de terceiros">Obra de terceiros</option>
+              <option value="Interperie">Interperie</option>
+              <option value="Ataque de animais">Ataque de animais</option>
+            </select>
           </div>
           <div>
             <label>Previsão para solicitação de testes</label>
             <input type="time" id="recuperacao_prev_testes">
           </div>
         </div>
-
         <div class="form-group">
           <div>
             <label>Endereço da falha</label>
@@ -353,52 +245,80 @@
           </div>
           <div>
             <label>Cabo / Capacidade / ARO</label>
-            <input type="text" id="recuperacao_cabo" placeholder="Ex: CAB-001 48F ARO-05">
+            <input type="text" id="recuperacao_cabo" placeholder="Ex: DROP 4F, 12F, 24F, 36F, 48F, 72F, 144F">
           </div>
         </div>
-
         <div class="form-group full">
           <div>
             <label>Tratativas realizadas</label>
             <textarea id="recuperacao_tratativas" placeholder="Descreva as tratativas"></textarea>
           </div>
         </div>
-
         <div class="form-group full">
           <div>
             <label>Observações</label>
             <textarea id="recuperacao_obs" placeholder="Observações gerais"></textarea>
           </div>
         </div>
-
-        <div class="form-group full">
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="recuperacao_analista" placeholder="Nome do Analista">
-          </div>
-        </div>
-
         <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab3')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab3')">Limpar Formulário</button>
+          <button class="btn-generate" onclick="generateStamp('recuperacao')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3B -->
-    <div id="tab3b" class="content">
-      <div class="reuse-note">ID Ocorrência já está preenchido automaticamente.</div>
-
+    <div class="dynamic-content" id="content-certificacao">
       <div class="section">
-        <div class="section-title">COMPLEMENTAR</div>
-
+        <div class="section-title">SOLICITAÇÃO DE CERTIFICAÇÃO</div>
         <div class="form-group full">
           <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia3b" placeholder="Ex: OCR-2024-001" readonly>
+            <label>Tratativa realizada</label>
+            <textarea id="certificacao_tratativa" placeholder="Descrição da tratativa realizada"></textarea>
           </div>
         </div>
+        <div class="form-group">
+          <div>
+            <label>Causa</label>
+            <select id="certificacao_causa">
+              <option value="" disabled selected>Selecione</option>
+              <option value="Abalroamento">Abalroamento</option>
+              <option value="Furto">Furto</option>
+              <option value="Acidente">Acidente</option>
+              <option value="Descarga">Descarga</option>
+              <option value="Vandalismo">Vandalismo</option>
+              <option value="Troca de poste">Troca de poste</option>
+              <option value="Degradação / Infiltração">Degradação / Infiltração</option>
+              <option value="Defeito Splitter">Defeito Splitter</option>
+              <option value="Falha em atividade anterior">Falha em atividade anterior</option>
+              <option value="Obra de terceiros">Obra de terceiros</option>
+              <option value="Interperie">Interperie</option>
+              <option value="Ataque de animais">Ataque de animais</option>
+            </select>
+          </div>
+          <div>
+            <label>Material utilizado</label>
+            <input type="text" id="certificacao_material" placeholder="Ex: Conector SC, Fibra óptica">
+          </div>
+        </div>
+        <div class="form-group">
+          <div>
+            <label>Foto em anexo</label>
+            <div class="checkbox-group">
+              <label><input type="radio" name="certificacao_foto" value="Sim"> Sim</label>
+              <label><input type="radio" name="certificacao_foto" value="Não"> Não</label>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-generate" onclick="generateStamp('certificacao')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
+        </div>
+      </div>
+    </div>
 
+    <div class="dynamic-content" id="content-complementar">
+      <div class="section">
+        <div class="section-title">COMPLEMENTAR</div>
         <div class="form-group">
           <div>
             <label>Motivo</label>
@@ -409,7 +329,6 @@
             <input type="text" id="complementar_info" placeholder="Informação adicional">
           </div>
         </div>
-
         <div class="form-group">
           <div>
             <label>Nova previsão?</label>
@@ -423,143 +342,22 @@
             <input type="time" id="complementar_previsao">
           </div>
         </div>
-
-        <div class="form-group full">
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="complementar_analista" placeholder="Nome do Analista">
-          </div>
-        </div>
-
         <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab3b')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab3b')">Limpar Formulário</button>
+          <button class="btn-generate" onclick="generateStamp('complementar')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 4 -->
-    <div id="tab4" class="content">
-      <div class="reuse-note">SUPERVISOR/tel., TÉCNICO/tel. e ID Ocorrência já estão preenchidos automaticamente.</div>
-
-      <div class="section">
-        <div class="section-title">SOLICITAÇÃO DE CERTIFICAÇÃO</div>
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia4" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
-
-
-        <div class="form-group">
-          <div>
-            <label>SUPERVISOR</label>
-            <input type="text" id="supervisor4" placeholder="Nome do Supervisor" readonly>
-          </div>
-          <div>
-            <label>Telefone Supervisor</label>
-            <input type="tel" id="supervisor_tel4" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>TÉCNICO</label>
-            <input type="text" id="tecnico4" placeholder="Nome do Técnico" readonly>
-          </div>
-          <div>
-            <label>Telefone Técnico</label>
-            <input type="tel" id="tecnico_tel4" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        
-
-        <div class="form-group full">
-          <div>
-            <label>Tratativa realizada</label>
-            <textarea id="certificacao_tratativa" placeholder="Descrição da tratativa realizada"></textarea>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>Causa</label>
-            <input type="text" id="certificacao_causa" placeholder="Causa da falha">
-          </div>
-          <div>
-            <label>Material utilizado</label>
-            <input type="text" id="certificacao_material" placeholder="Ex: Conector SC, Fibra óptica">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>Foto em anexo</label>
-            <div class="checkbox-group">
-              <label><input type="radio" name="certificacao_foto" value="Sim"> Sim</label>
-              <label><input type="radio" name="certificacao_foto" value="Não"> Não</label>
-            </div>
-          </div>
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="certificacao_analista" placeholder="Nome do Analista">
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab4')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab4')">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 5 -->
-    <div id="tab5" class="content">
-      <div class="reuse-note">SUPERVISOR/tel., TÉCNICO/tel. e ID Ocorrência já estão preenchidos automaticamente.</div>
-
+    <div class="dynamic-content" id="content-naofalha">
       <div class="section">
         <div class="section-title">NÃO HÁ FALHA PARA REDE</div>
-        <div class="form-group full">
-          <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia5" placeholder="Ex: OCR-2024-001" readonly>
-          </div>
-        </div>
-
-
-        <div class="form-group">
-          <div>
-            <label>SUPERVISOR</label>
-            <input type="text" id="supervisor5" placeholder="Nome do Supervisor" readonly>
-          </div>
-          <div>
-            <label>Telefone Supervisor</label>
-            <input type="tel" id="supervisor_tel5" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>TÉCNICO</label>
-            <input type="text" id="tecnico5" placeholder="Nome do Técnico" readonly>
-          </div>
-          <div>
-            <label>Telefone Técnico</label>
-            <input type="tel" id="tecnico_tel5" placeholder="Telefone" readonly>
-          </div>
-        </div>
-
-        
-
         <div class="form-group full">
           <div>
             <label>Motivo da Improdutiva</label>
             <textarea id="naofalha_motivo" placeholder="Descreva o motivo da improdutiva"></textarea>
           </div>
         </div>
-
         <div class="form-group">
           <div>
             <label>Foto em anexo</label>
@@ -573,67 +371,77 @@
             <input type="text" id="naofalha_gestor" value="João Andrioli" readonly>
           </div>
         </div>
-
-        <div class="form-group full">
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="naofalha_analista" placeholder="Nome do Analista">
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">ESCALONAMENTO PRAZO REPARO</div>
-
-        <div class="form-group">
-          <div>
-            <label>Cargo</label>
-            <input type="text" id="escalonamento_prazo_cargo" placeholder="Ex: Coordenador, Supervisor">
-          </div>
-          <div>
-            <label>Nome / Telefone</label>
-            <input type="text" id="escalonamento_prazo_nome_tel" placeholder="Nome e telefone">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div>
-            <label>SLA do evento</label>
-            <input type="text" id="escalonamento_prazo_sla" placeholder="Ex: 4h, 2h">
-          </div>
-          <div>
-            <label>Observações</label>
-            <input type="text" id="escalonamento_prazo_obs" placeholder="Observações">
-          </div>
-        </div>
-
         <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab5')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab5')">Limpar Formulário</button>
+          <button class="btn-generate" onclick="generateStamp('naofalha')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 6 -->
-    <div id="tab6" class="content">
-      <div class="reuse-note">ID Ocorrência já está preenchido automaticamente.</div>
-
+    <div class="dynamic-content" id="content-transbordo">
       <div class="section">
-        <div class="section-title">INTERVENÇÃO CIRE</div>
-
-        <div class="form-group full">
+        <div class="section-title">TRANSBORDO</div>
+        <div class="form-group">
           <div>
-            <label>ID Ocorrência</label>
-            <input type="text" id="id_ocorrencia6" placeholder="Ex: OCR-2024-001" readonly>
+            <label>TA</label>
+            <input type="text" id="transbordota" placeholder="TA">
+          </div>
+          <div>
+            <label>CONTRATO</label>
+            <input type="text" id="transbordocontrato" placeholder="Contrato">
           </div>
         </div>
+        <div class="form-group">
+          <div>
+            <label>TRANSBORDO</label>
+            <input type="text" id="transbordooperadora" value="VIVO" readonly>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-generate" onclick="generateStamp('transbordo')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
+        </div>
+      </div>
+    </div>
 
+    <div class="dynamic-content" id="content-prazo">
+      <div class="section">
+        <div class="section-title">PRAZO DE REPARO</div>
+        <div class="form-group">
+          <div>
+            <label>Cargo</label>
+            <input type="text" id="prazoreparocargo" placeholder="Ex: Coordenador, Supervisor">
+          </div>
+          <div>
+            <label>Nome / Telefone</label>
+            <input type="text" id="prazoreparonometel" placeholder="Nome e telefone">
+          </div>
+        </div>
+        <div class="form-group">
+          <div>
+            <label>SLA do evento</label>
+            <input type="text" id="prazoreparosla" placeholder="Ex: 4h, 2h">
+          </div>
+          <div>
+            <label>Observações</label>
+            <input type="text" id="prazoreparoobs" placeholder="Observações">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-generate" onclick="generateStamp('prazo')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dynamic-content" id="content-cire">
+      <div class="section">
+        <div class="section-title">INTERVENÇÃO CIRE</div>
         <div class="form-group">
           <div>
             <label>Solicitante</label>
             <input type="text" id="cire_solicitante" placeholder="Nome do Solicitante">
           </div>
-
           <div>
             <label>Meio de contato</label>
             <div class="checkbox-group">
@@ -643,56 +451,135 @@
             </div>
           </div>
         </div>
-
         <div class="form-group full">
           <div>
             <label>Motivo</label>
             <textarea id="cire_motivo" placeholder="Descreva o motivo da intervenção CIRE"></textarea>
           </div>
         </div>
-
         <div class="form-group full">
           <div>
             <label>Informação</label>
             <textarea id="cire_info" placeholder="Informações adicionais"></textarea>
           </div>
         </div>
-
         <div class="form-group">
           <div>
             <label>Previsão</label>
             <input type="time" id="cire_previsao">
           </div>
-          <div>
-            <label>Analista CCR</label>
-            <input type="text" id="cire_analista" placeholder="Nome do Analista">
-          </div>
         </div>
-
         <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('tab6')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearTab('tab6')">Limpar Formulário</button>
+          <button class="btn-generate" onclick="generateStamp('cire')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
         </div>
       </div>
     </div>
 
-    <!-- OUTPUT -->
+    <div class="dynamic-content" id="content-escalonamento">
+      <div class="section">
+        <div class="section-title">ESCALONAMENTO SEM EQUIPE</div>
+        <div class="form-group">
+          <div>
+            <label>Cargo</label>
+            <input type="text" id="escalonamento_cargo" placeholder="Ex: Coordenador, Supervisor">
+          </div>
+          <div>
+            <label>Nome / Telefone</label>
+            <input type="text" id="escalonamento_nome_tel" placeholder="Nome e telefone">
+          </div>
+        </div>
+        <div class="form-group">
+          <div>
+            <label>SLA do evento</label>
+            <input type="text" id="escalonamento_sla" placeholder="Ex: 4h, 2h">
+          </div>
+          <div>
+            <label>Observações</label>
+            <input type="text" id="escalonamento_obs" placeholder="Observações">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-generate" onclick="generateStamp('escalonamento')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dynamic-content" id="content-cto_defeito">
+      <div class="section">
+        <div class="section-title">CTO COM DEFEITO</div>
+        <div class="form-group">
+          <div>
+            <label>Nome SITE/ARO</label>
+            <input type="text" id="cto_defeito_site" list="siteList" placeholder="Digite para pesquisar ou selecione na lista">
+          </div>
+          <div>
+            <label>Splitter</label>
+            <input type="text" id="cto_defeito_splitter" placeholder="Ex: 1/8, 1/16, 1/32">
+          </div>
+        </div>
+        <div class="form-group">
+          <div>
+            <label>Caixa</label>
+            <input type="text" id="cto_defeito_caixa" placeholder="Ex: Caixa 01, Caixa 02">
+          </div>
+          <div>
+            <label>Endereço</label>
+            <input type="text" id="cto_defeito_endereco" placeholder="Rua, Número, Complemento">
+          </div>
+        </div>
+        <div class="form-group">
+          <div>
+            <label>Causa</label>
+            <select id="cto_defeito_causa">
+              <option value="" disabled selected>Selecione</option>
+              <option value="Abalroamento">Abalroamento</option>
+              <option value="Furto">Furto</option>
+              <option value="Acidente">Acidente</option>
+              <option value="Descarga">Descarga</option>
+              <option value="Vandalismo">Vandalismo</option>
+              <option value="Troca de poste">Troca de poste</option>
+              <option value="Degradação / Infiltração">Degradação / Infiltração</option>
+              <option value="Defeito Splitter">Defeito Splitter</option>
+              <option value="Falha em atividade anterior">Falha em atividade anterior</option>
+              <option value="Obra de terceiros">Obra de terceiros</option>
+              <option value="Interperie">Interperie</option>
+              <option value="Ataque de animais">Ataque de animais</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group full">
+          <div>
+            <label>Tratativa realizada</label>
+            <textarea id="cto_defeito_tratativa" placeholder="Descreva a tratativa realizada"></textarea>
+          </div>
+        </div>
+        <div class="form-group full">
+          <div>
+            <label>Material utilizado</label>
+            <input type="text" id="cto_defeito_material" placeholder="Ex: Conector SC, Fibra óptica, Splitter">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-generate" onclick="generateStamp('cto_defeito')">Gerar Carimbo</button>
+          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
+        </div>
+      </div>
+    </div>
+
     <div id="output" class="output-section">
       <h3>Carimbo de Texto Gerado</h3>
       <div class="output-text" id="outputText"></div>
-
       <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
         <button class="btn-copy" onclick="copyToClipboard()">Copiar para Área de Transferência</button>
         <button class="btn-copy" onclick="sendToWhatsApp()" style="background:#25d366;">Enviar via WhatsApp</button>
       </div>
-
       <div class="success-message" id="successMessage">Texto copiado para a área de transferência!</div>
     </div>
   </div>
 
   <script>
-    // Preencha os telefones reais aqui:
-    // Dica: as chaves são normalizadas (sem acento, minúsculas), então "Mário" e "Mario" funcionam.
     const supervisorPhones = {
       "alexandre ilha": "(51) 99753-4576",
       "diego jaworski": "(51) 99670-7110",
@@ -711,278 +598,119 @@
         .trim();
     }
 
-    function switchTab(tabName, event) {
-      const contents = document.querySelectorAll(".content");
-      const buttons = document.querySelectorAll(".tab-btn");
-
-      contents.forEach(c => c.classList.remove("active"));
-      buttons.forEach(b => b.classList.remove("active"));
-
-      document.getElementById(tabName).classList.add("active");
-      if (event && event.target) event.target.classList.add("active");
-
+    document.getElementById("carimbo_tipo").addEventListener("change", function() {
+      const tipo = this.value;
+      document.querySelectorAll(".dynamic-content").forEach(el => {
+        el.classList.remove("active");
+      });
+      if (tipo) {
+        const contentId = "content-" + tipo;
+        const content = document.getElementById(contentId);
+        if (content) content.classList.add("active");
+      } else {
+        document.getElementById("content-default").classList.add("active");
+      }
       document.getElementById("output").classList.remove("active");
+    });
+
+    document.getElementById("supervisor").addEventListener("input", function() {
+      const nome = this.value;
+      const tel = supervisorPhones[normalizeName(nome)];
+      if (tel) document.getElementById("supervisor_tel").value = tel;
+    });
+
+    function clearDynamic() {
+      const tipo = document.getElementById("carimbo_tipo").value;
+      if (!tipo) return;
+      const contentId = "content-" + tipo;
+      const content = document.getElementById(contentId);
+      const inputs = content.querySelectorAll("input[type='text'], input[type='tel'], input[type='number'], input[type='time'], textarea, select");
+      inputs.forEach(input => {
+        if (input.readOnly) return;
+        if (input.type === "radio" || input.type === "checkbox") {
+          input.checked = false;
+        } else {
+          input.value = "";
+        }
+      });
     }
 
-    function setValueIfExists(id, value) {
-      const el = document.getElementById(id);
-      if (el) el.value = value;
-    }
-
-    function updateReusableFields() {
+    function generateStamp(tipo) {
+      const idOcorrencia = document.getElementById("id_ocorrencia").value;
       const supervisor = document.getElementById("supervisor").value;
       const supervisorTel = document.getElementById("supervisor_tel").value;
       const tecnico = document.getElementById("tecnico").value;
       const tecnicoTel = document.getElementById("tecnico_tel").value;
-      const idOcorrencia = document.getElementById("id_ocorrencia").value;
-
-      // Replica Supervisor/Técnico nas abas 2 a 5
-      for (let i = 2; i <= 5; i++) {
-        setValueIfExists(`supervisor${i}`, supervisor);
-        setValueIfExists(`supervisor_tel${i}`, supervisorTel);
-        setValueIfExists(`tecnico${i}`, tecnico);
-        setValueIfExists(`tecnico_tel${i}`, tecnicoTel);
-      }
-
-      // Replica ID Ocorrência nos demais carimbos
-      setValueIfExists("id_ocorrencia1b", idOcorrencia);
-      setValueIfExists("id_ocorrencia2", idOcorrencia);
-      setValueIfExists("id_ocorrencia3", idOcorrencia);
-      setValueIfExists("id_ocorrencia3b", idOcorrencia);
-      setValueIfExists("id_ocorrencia4", idOcorrencia);
-      setValueIfExists("id_ocorrencia5", idOcorrencia);
-      setValueIfExists("id_ocorrencia6", idOcorrencia);
-    }
-
-    // Supervisor: pesquisa + seleção + telefone automático
-    document.getElementById("supervisor").addEventListener("input", () => {
-      const nome = document.getElementById("supervisor").value;
-      const tel = supervisorPhones[normalizeName(nome)];
-      if (tel) document.getElementById("supervisor_tel").value = tel;
-      updateReusableFields();
-    });
-
-    // Atualiza reuso ao editar manualmente
-    document.getElementById("supervisor_tel").addEventListener("input", updateReusableFields);
-    document.getElementById("tecnico").addEventListener("input", updateReusableFields);
-    document.getElementById("tecnico_tel").addEventListener("input", updateReusableFields);
-    document.getElementById("id_ocorrencia").addEventListener("input", updateReusableFields);
-
-    function generateStamp(tabName) {
+      const analistaCCR = document.getElementById("analista_ccr").value;
       let stamp = "";
 
-      if (tabName === "tab1") {
-        const supervisor = document.getElementById("supervisor").value;
-        const supervisorTel = document.getElementById("supervisor_tel").value;
-        const tecnico = document.getElementById("tecnico").value;
-        const tecnicoTel = document.getElementById("tecnico_tel").value;
+      if (tipo === "acionamento") {
         const prevChegada = document.getElementById("acionamento_prev_chegada").value;
         const site = document.getElementById("acionamento_site").value;
-        const analista = document.getElementById("acionamento_analista").value;
-        const idOcorrencia = document.getElementById("id_ocorrencia").value;
-
-        stamp = `
-1 – ACIONAMENTO
-ID Ocorrência: ${idOcorrencia}
-
-SUPERVISOR: ${supervisor}
-Telefone: ${supervisorTel}
-
-TÉCNICO: ${tecnico}
-Telefone: ${tecnicoTel}
-
-Previsão de chegada ao SITE/ARO para medições: ${prevChegada}
-Nome SITE/ARO para medições: ${site}
-
-Analista CCR: ${analista}`.trim();
-
-      } else if (tabName === "tab1b") {
-        const idOcorrencia = document.getElementById("id_ocorrencia1b").value;
-        const cargo = document.getElementById("escalonamento_cargo").value;
-        const nomeTel = document.getElementById("escalonamento_nome_tel").value;
-        const sla = document.getElementById("escalonamento_sla").value;
-        const obs = document.getElementById("escalonamento_obs").value;
-        const analista = document.getElementById("escalonamento_analista").value;
-
-        stamp = `
-ESCALONAMENTO SEM EQUIPE
-ID Ocorrência: ${idOcorrencia}
-
-Cargo: ${cargo}
-Nome/Tel.: ${nomeTel}
-SLA do evento: ${sla}
-Obs.: ${obs}
-Analista CCR: ${analista}`.trim();
-
-      } else if (tabName === "tab2") {
-        const supervisor = document.getElementById("supervisor2").value;
-        const supervisorTel = document.getElementById("supervisor_tel2").value;
-        const tecnico = document.getElementById("tecnico2").value;
-        const tecnicoTel = document.getElementById("tecnico_tel2").value;
-        const idOcorrencia = document.getElementById("id_ocorrencia2").value;
-
+        stamp = `1 – ACIONAMENTO\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nPrevisão de chegada ao SITE/ARO para medições: ${prevChegada}\nNome SITE/ARO para medições: ${site}\n\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "deslocamento") {
         const km = document.getElementById("deslocamento_km").value;
         const prevChegada = document.getElementById("deslocamento_prev_chegada").value;
         const obs = document.getElementById("deslocamento_obs").value;
-        const analista = document.getElementById("deslocamento_analista").value;
-
-        stamp = `
-2 – DESLOCAMENTO AO PONTO DA FALHA
-ID Ocorrência: ${idOcorrencia}
-
-SUPERVISOR: ${supervisor}
-Telefone: ${supervisorTel}
-
-TÉCNICO: ${tecnico}
-Telefone: ${tecnicoTel}
-
-KM até o LOCAL da falha: ${km} km
-Previsão de chegada ao LOCAL da falha: ${prevChegada}
-
-Obs.: ${obs}
-Analista CCR: ${analista}`.trim();
-
-      } else if (tabName === "tab3") {
-        const supervisor = document.getElementById("supervisor3").value;
-        const supervisorTel = document.getElementById("supervisor_tel3").value;
-        const tecnico = document.getElementById("tecnico3").value;
-        const tecnicoTel = document.getElementById("tecnico_tel3").value;
-        const idOcorrencia = document.getElementById("id_ocorrencia3").value;
-
+        stamp = `2 – DESLOCAMENTO AO PONTO DA FALHA\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nKM até o LOCAL da falha: ${km} km\nPrevisão de chegada ao LOCAL da falha: ${prevChegada}\n\nObs.: ${obs}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "recuperacao") {
         const causa = document.getElementById("recuperacao_causa").value;
         const prevTestes = document.getElementById("recuperacao_prev_testes").value;
         const endereco = document.getElementById("recuperacao_endereco").value;
         const cabo = document.getElementById("recuperacao_cabo").value;
         const tratativas = document.getElementById("recuperacao_tratativas").value;
         const obs = document.getElementById("recuperacao_obs").value;
-        const analista = document.getElementById("recuperacao_analista").value;
-
-        stamp = `
-3 – RECUPERAÇÃO DA FALHA
-ID Ocorrência: ${idOcorrencia}
-
-SUPERVISOR: ${supervisor}
-Telefone: ${supervisorTel}
-
-TÉCNICO: ${tecnico}
-Telefone: ${tecnicoTel}
-
-Causa raiz: ${causa}
-Previsão para solicitação de testes: ${prevTestes}
-Endereço da falha: ${endereco}
-Cabo/Capacidade/ARO: ${cabo}
-
-Tratativas realizadas: ${tratativas}
-
-Obs.: ${obs}
-Analista CCR: ${analista}`.trim();
-
-      } else if (tabName === "tab3b") {
-        const idOcorrencia = document.getElementById("id_ocorrencia3b").value;
-        const motivo = document.getElementById("complementar_motivo").value;
-        const info = document.getElementById("complementar_info").value;
-        const novaPrevisao = document.querySelector("input[name='nova_previsao']:checked")?.value || "";
-        const previsao = document.getElementById("complementar_previsao").value;
-        const analista = document.getElementById("complementar_analista").value;
-
-        stamp = `
-3B – COMPLEMENTAR
-ID Ocorrência: ${idOcorrencia}
-
-Motivo: ${motivo}
-Informação: ${info}
-Nova previsão: ${novaPrevisao}
-Previsão: ${previsao}
-Analista CCR: ${analista}`.trim();
-
-      } else if (tabName === "tab4") {
-        const supervisor = document.getElementById("supervisor4").value;
-        const supervisorTel = document.getElementById("supervisor_tel4").value;
-        const tecnico = document.getElementById("tecnico4").value;
-        const tecnicoTel = document.getElementById("tecnico_tel4").value;
-        const idOcorrencia = document.getElementById("id_ocorrencia4").value;
-
+        stamp = `3 – RECUPERAÇÃO DA FALHA\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nCausa raiz: ${causa}\nPrevisão para solicitação de testes: ${prevTestes}\nEndereço da falha: ${endereco}\nCabo/Capacidade/ARO: ${cabo}\n\nTratativas realizadas: ${tratativas}\n\nObs.: ${obs}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "certificacao") {
         const tratativa = document.getElementById("certificacao_tratativa").value;
         const causa = document.getElementById("certificacao_causa").value;
         const material = document.getElementById("certificacao_material").value;
         const foto = document.querySelector("input[name='certificacao_foto']:checked")?.value || "";
-        const analista = document.getElementById("certificacao_analista").value;
-
-        stamp = `
-4 – SOLICITAÇÃO DE CERTIFICAÇÃO
-ID Ocorrência: ${idOcorrencia}
-
-SUPERVISOR: ${supervisor}
-Telefone: ${supervisorTel}
-
-TÉCNICO: ${tecnico}
-Telefone: ${tecnicoTel}
-
-Tratativa realizada: ${tratativa}
-Causa: ${causa}
-Material utilizado: ${material}
-Foto em anexo: ${foto}
-Analista CCR: ${analista}`.trim();
-
-      } else if (tabName === "tab5") {
-        const supervisor = document.getElementById("supervisor5").value;
-        const supervisorTel = document.getElementById("supervisor_tel5").value;
-        const tecnico = document.getElementById("tecnico5").value;
-        const tecnicoTel = document.getElementById("tecnico_tel5").value;
-        const idOcorrencia = document.getElementById("id_ocorrencia5").value;
-
+        stamp = `4 – SOLICITAÇÃO DE CERTIFICAÇÃO\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nTratativa realizada: ${tratativa}\nCausa: ${causa}\nMaterial utilizado: ${material}\nFoto em anexo: ${foto}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "complementar") {
+        const motivo = document.getElementById("complementar_motivo").value;
+        const info = document.getElementById("complementar_info").value;
+        const novaPrevisao = document.querySelector("input[name='nova_previsao']:checked")?.value || "";
+        const previsao = document.getElementById("complementar_previsao").value;
+        stamp = `3B – COMPLEMENTAR\nID Ocorrência: ${idOcorrencia}\n\nMotivo: ${motivo}\nInformação: ${info}\nNova previsão? ${novaPrevisao}\nPrevisão: ${previsao}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "naofalha") {
         const motivo = document.getElementById("naofalha_motivo").value;
         const foto = document.querySelector("input[name='naofalha_foto']:checked")?.value || "";
         const gestor = document.getElementById("naofalha_gestor").value;
-        const analista = document.getElementById("naofalha_analista").value;
-
-        const cargo = document.getElementById("escalonamento_prazo_cargo").value;
-        const nomeTel = document.getElementById("escalonamento_prazo_nome_tel").value;
-        const sla = document.getElementById("escalonamento_prazo_sla").value;
-        const obs = document.getElementById("escalonamento_prazo_obs").value;
-
-        stamp = `
-NÃO HÁ FALHA PARA REDE
-ID Ocorrência: ${idOcorrencia}
-
-SUPERVISOR: ${supervisor}
-Telefone: ${supervisorTel}
-
-TÉCNICO: ${tecnico}
-Telefone: ${tecnicoTel}
-
-Motivo da improdutiva: ${motivo}
-Foto em anexo: ${foto}
-Ciente (Gestor VIVO Rede): ${gestor}
-Analista CCR: ${analista}
-
-ESCALONAMENTO PRAZO REPARO
-Cargo: ${cargo}
-Nome/Tel.: ${nomeTel}
-SLA do evento: ${sla}
-Obs.: ${obs}`.trim();
-
-      } else if (tabName === "tab6") {
-        const idOcorrencia = document.getElementById("id_ocorrencia6").value;
+        stamp = `NÃO HÁ FALHA PARA REDE\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nMotivo da improdutiva: ${motivo}\nFoto em anexo: ${foto}\nCiente (Gestor VIVO Rede): ${gestor}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "transbordo") {
+        const ta = document.getElementById("transbordota").value;
+        const contrato = document.getElementById("transbordocontrato").value;
+        const transbordo = document.getElementById("transbordooperadora").value;
+        stamp = `TRANSBORDO\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nTA: ${ta}\nCONTRATO: ${contrato}\nTRANSBORDO: ${transbordo}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "prazo") {
+        const cargo = document.getElementById("prazoreparocargo").value;
+        const nomeTel = document.getElementById("prazoreparonometel").value;
+        const sla = document.getElementById("prazoreparosla").value;
+        const obs = document.getElementById("prazoreparoobs").value;
+        stamp = `PRAZO DE REPARO\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nCargo: ${cargo}\nNome/Tel.: ${nomeTel}\nSLA do evento: ${sla}\nObs.: ${obs}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "cire") {
         const solicitante = document.getElementById("cire_solicitante").value;
         const contato = document.querySelector("input[name='cire_contato']:checked")?.value || "";
         const motivo = document.getElementById("cire_motivo").value;
         const info = document.getElementById("cire_info").value;
         const previsao = document.getElementById("cire_previsao").value;
-        const analista = document.getElementById("cire_analista").value;
-
-        stamp = `
-INTERVENÇÃO CIRE
-ID Ocorrência: ${idOcorrencia}
-
-Solicitante: ${solicitante}
-Meio de contato: ${contato}
-
-Motivo: ${motivo}
-Informação: ${info}
-
-Previsão: ${previsao}
-Analista CCR: ${analista}`.trim();
+        stamp = `INTERVENÇÃO CIRE\nID Ocorrência: ${idOcorrencia}\n\nSolicitante: ${solicitante}\nMeio de contato: ${contato}\nMotivo: ${motivo}\nInformação: ${info}\nPrevisão: ${previsao}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "escalonamento") {
+        const cargo = document.getElementById("escalonamento_cargo").value;
+        const nomeTel = document.getElementById("escalonamento_nome_tel").value;
+        const sla = document.getElementById("escalonamento_sla").value;
+        const obs = document.getElementById("escalonamento_obs").value;
+        stamp = `ESCALONAMENTO SEM EQUIPE\nID Ocorrência: ${idOcorrencia}\n\nCargo: ${cargo}\nNome/Tel.: ${nomeTel}\nSLA do evento: ${sla}\nObs.: ${obs}\nAnalista CCR: ${analistaCCR}`.trim();
+      } else if (tipo === "cto_defeito") {
+        const site = document.getElementById("cto_defeito_site").value;
+        const splitter = document.getElementById("cto_defeito_splitter").value;
+        const caixa = document.getElementById("cto_defeito_caixa").value;
+        const endereco = document.getElementById("cto_defeito_endereco").value;
+        const causa = document.getElementById("cto_defeito_causa").value;
+        const tratativa = document.getElementById("cto_defeito_tratativa").value;
+        const material = document.getElementById("cto_defeito_material").value;
+        stamp = `CTO COM DEFEITO\nID Ocorrência: ${idOcorrencia}\n\nSUPERVISOR: ${supervisor}\nTelefone: ${supervisorTel}\n\nTÉCNICO: ${tecnico}\nTelefone: ${tecnicoTel}\n\nNome SITE/ARO: ${site}\nSplitter: ${splitter}\nCaixa: ${caixa}\nEndereço: ${endereco}\nCausa: ${causa}\n\nTratativa realizada: ${tratativa}\nMaterial utilizado: ${material}\n\nAnalista CCR: ${analistaCCR}`.trim();
       }
 
       document.getElementById("outputText").textContent = stamp;
@@ -1006,25 +734,7 @@ Analista CCR: ${analista}`.trim();
         return;
       }
       const encodedText = encodeURIComponent(outputText);
-      window.open(`https://wa.me/?text=${encodedText}`, "_blank");
-    }
-
-    function clearTab(tabName) {
-      const inputs = document.querySelectorAll(`#${tabName} input, #${tabName} textarea, #${tabName} select`);
-      inputs.forEach(input => {
-        // Não limpar campos fixos (readonly/disabled) como ID replicado e Gestor
-        if (input.readOnly || input.disabled) return;
-        if (input.type === "radio" || input.type === "checkbox") {
-          input.checked = false;
-        } else {
-          input.value = "";
-        }
-      });
-
-      // Após limpar a aba 1, refaz a replicação (para limpar as readonly também)
-      if (tabName === "tab1") updateReusableFields();
-
-      document.getElementById("output").classList.remove("active");
+      window.open("https://wa.me/?text=" + encodedText, "_blank");
     }
   </script>
 </body>
