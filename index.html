@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Carimbo de Texto - Acionamento GPON</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #004d99;
+            flex-wrap: wrap;
+            border-bottom: 3px solid #003366;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            background-color: #004d99;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background-color: #003366;
+        }
+
+        .tab-btn.active {
+            background-color: #ff6600;
+            border-bottom: 4px solid #ff6600;
+        }
+
+        .content {
+            padding: 20px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+
+        .section-title {
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 12px;
+            font-size: 14px;
+            border-bottom: 2px solid #ff6600;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group.three-col {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #999;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+            font-family: Arial, sans-serif;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #ff6600;
+            background-color: #fffef0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+        }
+
+        .checkbox-group label {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+        }
+
+        .reuse-note {
+            background-color: #e8f4f8;
+            border-left: 4px solid #0066cc;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 11px;
+            color: #003366;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn-generate {
+            background-color: #ff6600;
+            color: white;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-generate:hover {
+            background-color: #e55a00;
+        }
+
+        .btn-copy {
+            background-color: #0066cc;
+            color: white;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-copy:hover {
+            background-color: #0052a3;
+        }
+
+        .btn-clear {
+            background-color: #999;
+            color: white;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-clear:hover {
+            background-color: #777;
+        }
+
+        .output-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .output-section.active {
+            display: block;
+        }
+
+        .output-section h3 {
+            color: #003366;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .output-text {
+            background-color: #ffffff;
+            padding: 12px;
+            border: 1px solid #999;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #333;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.three-col {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-btn {
+                min-width: 100px;
+                font-size: 11px;
+                padding: 10px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Gerador de Carimbo de Texto</h1>
+            <p>Sistema de Acionamento - GPON - Vivo Rede</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab1')">1 - ACIONAMENTO</button>
+            <button class="tab-btn" onclick="switchTab('tab2')">2 - DESLOCAMENTO</button>
+            <button class="tab-btn" onclick="switchTab('tab3')">3 - RECUPERAÇÃO</button>
+            <button class="tab-btn" onclick="switchTab('tab3b')">3B - COMPLEMENTAR</button>
+            <button class="tab-btn" onclick="switchTab('tab4')">4 - CERTIFICAÇÃO</button>
+            <button class="tab-btn" onclick="switchTab('tab5')">NÃO HÁ FALHA</button>
+            <button class="tab-btn" onclick="switchTab('tab6')">CIRE</button>
+            <button class="tab-btn" onclick="switchTab('tab1b')">ESC. SEM EQUIPE</button>
+        </div>
+
+        <!-- TAB 1: ACIONAMENTO -->
+        <div id="tab1" class="content active">
+            <div class="reuse-note">
+                ✓ Os dados de SUPERVISOR/tel. e TÉCNICO/tel. são reutilizados automaticamente em outras seções
+            </div>
+
+            <div class="section">
+                <div class="section-title">ACIONAMENTO</div>
+                <div class="form-group">
+                    <div>
+                        <label>SUPERVISOR</label>
+                        <input type="text" id="supervisor" placeholder="Nome do Supervisor">
+                    </div>
+                    <div>
+                        <label>Telefone Supervisor</label>
+                        <input type="tel" id="supervisor_tel" placeholder="(11) 98765-4321">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>TÉCNICO</label>
+                        <input type="text" id="tecnico" placeholder="Nome do Técnico">
+                    </div>
+                    <div>
+                        <label>Telefone Técnico</label>
+                        <input type="tel" id="tecnico_tel" placeholder="(11) 99876-5432">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Previsão de chegada ao SITE/ARO para medições</label>
+                        <input type="time" id="acionamento_prev_chegada">
+                    </div>
+                    <div>
+                        <label>Nome SITE/ARO para medições</label>
+                        <input type="text" id="acionamento_site" placeholder="Ex: PON-001, ARO-05">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="acionamento_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>ID Ocorrência</label>
+                        <input type="text" id="id_ocorrencia" placeholder="Ex: OCR-2024-001">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab1')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab1')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- TAB 1B: ESCALONAMENTO SEM EQUIPE (ABA SEPARADA) -->
+        <div id="tab1b" class="content">
+            <div class="section">
+                <div class="section-title">ESCALONAMENTO SEM EQUIPE</div>
+                <div class="form-group">
+                    <div>
+                        <label>Cargo</label>
+                        <input type="text" id="escalonamento_cargo" placeholder="Ex: Coordenador, Supervisor">
+                    </div>
+                    <div>
+                        <label>Nome / Telefone</label>
+                        <input type="text" id="escalonamento_nome_tel" placeholder="Nome e telefone">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>SLA do evento</label>
+                        <input type="text" id="escalonamento_sla" placeholder="Ex: 4h, 2h">
+                    </div>
+                    <div>
+                        <label>Observações</label>
+                        <input type="text" id="escalonamento_obs" placeholder="Observações">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="escalonamento_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab1b')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab1b')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: DESLOCAMENTO -->
+        <div id="tab2" class="content">
+            <div class="reuse-note">
+                ✓ SUPERVISOR/tel. e TÉCNICO/tel. já estão preenchidos automaticamente
+            </div>
+
+            <div class="section">
+                <div class="section-title">DESLOCAMENTO AO PONTO DA FALHA</div>
+                <div class="form-group">
+                    <div>
+                        <label>SUPERVISOR</label>
+                        <input type="text" id="supervisor2" placeholder="Nome do Supervisor" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Supervisor</label>
+                        <input type="tel" id="supervisor_tel2" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>TÉCNICO</label>
+                        <input type="text" id="tecnico2" placeholder="Nome do Técnico" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Técnico</label>
+                        <input type="tel" id="tecnico_tel2" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>KM até o LOCAL da falha</label>
+                        <input type="number" id="deslocamento_km" placeholder="Ex: 15.5">
+                    </div>
+                    <div>
+                        <label>Previsão de chegada ao LOCAL da falha</label>
+                        <input type="time" id="deslocamento_prev_chegada">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Observações</label>
+                        <textarea id="deslocamento_obs" placeholder="Observações sobre o deslocamento"></textarea>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="deslocamento_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab2')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab2')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- TAB 3: RECUPERAÇÃO -->
+        <div id="tab3" class="content">
+            <div class="reuse-note">
+                ✓ SUPERVISOR/tel. e TÉCNICO/tel. já estão preenchidos automaticamente
+            </div>
+
+            <div class="section">
+                <div class="section-title">RECUPERAÇÃO DA FALHA</div>
+                <div class="form-group">
+                    <div>
+                        <label>SUPERVISOR</label>
+                        <input type="text" id="supervisor3" placeholder="Nome do Supervisor" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Supervisor</label>
+                        <input type="tel" id="supervisor_tel3" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>TÉCNICO</label>
+                        <input type="text" id="tecnico3" placeholder="Nome do Técnico" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Técnico</label>
+                        <input type="tel" id="tecnico_tel3" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Causa raiz</label>
+                        <textarea id="recuperacao_causa" placeholder="Descrição da causa raiz" style="min-height: 60px;"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Previsão para solicitação de testes</label>
+                        <input type="time" id="recuperacao_prev_testes">
+                    </div>
+                    <div>
+                        <label>Endereço da falha</label>
+                        <input type="text" id="recuperacao_endereco" placeholder="Rua, Número, Complemento">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Cabo / Capacidade / ARO</label>
+                        <input type="text" id="recuperacao_cabo" placeholder="Ex: CAB-001 / 48F / ARO-05">
+                    </div>
+                    <div>
+                        <label>Tratativas realizadas</label>
+                        <textarea id="recuperacao_tratativas" placeholder="Descreva as tratativas"></textarea>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Observações</label>
+                        <textarea id="recuperacao_obs" placeholder="Observações gerais"></textarea>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="recuperacao_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab3')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab3')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- TAB 3B: COMPLEMENTAR -->
+        <div id="tab3b" class="content">
+            <div class="reuse-note">
+                ✓ SUPERVISOR/tel. e TÉCNICO/tel. já estão preenchidos automaticamente
+            </div>
+
+            <div class="section">
+                <div class="section-title">COMPLEMENTAR</div>
+                <div class="form-group">
+                    <div>
+                        <label>Motivo</label>
+                        <input type="text" id="complementar_motivo" placeholder="Motivo da complementação">
+                    </div>
+                    <div>
+                        <label>Informação</label>
+                        <input type="text" id="complementar_info" placeholder="Informação adicional">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Nova previsão?</label>
+                        <div class="checkbox-group">
+                            <label><input type="radio" name="nova_previsao" value="Sim"> Sim</label>
+                            <label><input type="radio" name="nova_previsao" value="Não"> Não</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label>Previsão</label>
+                        <input type="time" id="complementar_previsao">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="complementar_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab3b')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab3b')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- TAB 4: CERTIFICAÇÃO -->
+        <div id="tab4" class="content">
+            <div class="reuse-note">
+                ✓ SUPERVISOR/tel. e TÉCNICO/tel. já estão preenchidos automaticamente
+            </div>
+
+            <div class="section">
+                <div class="section-title">SOLICITAÇÃO DE CERTIFICAÇÃO</div>
+                <div class="form-group">
+                    <div>
+                        <label>SUPERVISOR</label>
+                        <input type="text" id="supervisor4" placeholder="Nome do Supervisor" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Supervisor</label>
+                        <input type="tel" id="supervisor_tel4" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>TÉCNICO</label>
+                        <input type="text" id="tecnico4" placeholder="Nome do Técnico" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Técnico</label>
+                        <input type="tel" id="tecnico_tel4" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Tratativa realizada</label>
+                        <textarea id="certificacao_tratativa" placeholder="Descrição da tratativa realizada"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Causa</label>
+                        <input type="text" id="certificacao_causa" placeholder="Causa da falha">
+                    </div>
+                    <div>
+                        <label>Material utilizado</label>
+                        <input type="text" id="certificacao_material" placeholder="Ex: Conector SC, Fibra óptica">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Foto em anexo</label>
+                        <div class="checkbox-group">
+                            <label><input type="radio" name="certificacao_foto" value="Sim"> Sim</label>
+                            <label><input type="radio" name="certificacao_foto" value="Não"> Não</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="certificacao_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab4')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab4')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- TAB 5: NÃO HÁ FALHA -->
+        <div id="tab5" class="content">
+            <div class="reuse-note">
+                ✓ SUPERVISOR/tel. e TÉCNICO/tel. já estão preenchidos automaticamente
+            </div>
+
+            <div class="section">
+                <div class="section-title">NÃO HÁ FALHA PARA REDE</div>
+                <div class="form-group">
+                    <div>
+                        <label>SUPERVISOR</label>
+                        <input type="text" id="supervisor5" placeholder="Nome do Supervisor" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Supervisor</label>
+                        <input type="tel" id="supervisor_tel5" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>TÉCNICO</label>
+                        <input type="text" id="tecnico5" placeholder="Nome do Técnico" readonly>
+                    </div>
+                    <div>
+                        <label>Telefone Técnico</label>
+                        <input type="tel" id="tecnico_tel5" placeholder="Telefone" readonly>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Motivo da Improdutiva</label>
+                        <textarea id="nao_falha_motivo" placeholder="Descreva o motivo da improdutiva"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Foto em anexo</label>
+                        <div class="checkbox-group">
+                            <label><input type="radio" name="nao_falha_foto" value="Sim"> Sim</label>
+                            <label><input type="radio" name="nao_falha_foto" value="Não"> Não</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Ciente (Gestor VIVO Rede)</label>
+                        <input type="text" id="nao_falha_gestor" placeholder="Nome do Gestor">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="nao_falha_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">ESCALONAMENTO PRAZO REPARO</div>
+                <div class="form-group">
+                    <div>
+                        <label>Cargo</label>
+                        <input type="text" id="escalonamento_prazo_cargo" placeholder="Ex: Coordenador, Supervisor">
+                    </div>
+                    <div>
+                        <label>Nome / Telefone</label>
+                        <input type="text" id="escalonamento_prazo_nome_tel" placeholder="Nome e telefone">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>SLA do evento</label>
+                        <input type="text" id="escalonamento_prazo_sla" placeholder="Ex: 4h, 2h">
+                    </div>
+                    <div>
+                        <label>Observações</label>
+                        <input type="text" id="escalonamento_prazo_obs" placeholder="Observações">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab5')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab5')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- TAB 6: CIRE -->
+        <div id="tab6" class="content">
+            <div class="section">
+                <div class="section-title">INTERVENÇÃO CIRE</div>
+                <div class="form-group">
+                    <div>
+                        <label>Solicitante</label>
+                        <input type="text" id="cire_solicitante" placeholder="Nome do Solicitante">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Meio de contato</label>
+                        <div class="checkbox-group">
+                            <label><input type="radio" name="cire_contato" value="Telefone"> Telefone</label>
+                            <label><input type="radio" name="cire_contato" value="E-mail"> E-mail</label>
+                            <label><input type="radio" name="cire_contato" value="WhatsApp"> WhatsApp</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Motivo</label>
+                        <textarea id="cire_motivo" placeholder="Descreva o motivo da intervenção CIRE"></textarea>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Informação</label>
+                        <textarea id="cire_info" placeholder="Informações adicionais"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label>Previsão</label>
+                        <input type="time" id="cire_previsao">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label>Analista CCR</label>
+                        <input type="text" id="cire_analista" placeholder="Nome do Analista">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-generate" onclick="generateStamp('tab6')">Gerar Carimbo</button>
+                <button class="btn-clear" onclick="clearTab('tab6')">Limpar Formulário</button>
+            </div>
+        </div>
+
+        <!-- OUTPUT SECTION -->
+        <div id="output" class="output-section">
+            <h3>📄 Carimbo de Texto Gerado</h3>
+            <div class="output-text" id="outputText"></div>
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                <button class="btn-copy" onclick="copyToClipboard()">📋 Copiar para Área de Transferência</button>
+                <button class="btn-copy" onclick="sendToWhatsApp()" style="background-color: #25d366;">💬 Enviar via WhatsApp</button>
+            </div>
+            <div class="success-message" id="successMessage">✓ Texto copiado para a área de transferência!</div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            const contents = document.querySelectorAll('.content');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            contents.forEach(c => c.classList.remove('active'));
+            buttons.forEach(b => b.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            document.getElementById('output').classList.remove('active');
+        }
+
+        function updateReusableFields() {
+            const supervisor = document.getElementById('supervisor').value;
+            const supervisorTel = document.getElementById('supervisor_tel').value;
+            const tecnico = document.getElementById('tecnico').value;
+            const tecnicoTel = document.getElementById('tecnico_tel').value;
+
+            for (let i = 2; i <= 6; i++) {
+                document.getElementById(`supervisor${i}`).value = supervisor;
+                document.getElementById(`supervisor_tel${i}`).value = supervisorTel;
+                document.getElementById(`tecnico${i}`).value = tecnico;
+                document.getElementById(`tecnico_tel${i}`).value = tecnicoTel;
+            }
+        }
+
+        document.getElementById('supervisor').addEventListener('change', updateReusableFields);
+        document.getElementById('supervisor_tel').addEventListener('change', updateReusableFields);
+        document.getElementById('tecnico').addEventListener('change', updateReusableFields);
+        document.getElementById('tecnico_tel').addEventListener('change', updateReusableFields);
+
+        function generateStamp(tabName) {
+            let stamp = '';
+
+            if (tabName === 'tab1') {
+                const supervisor = document.getElementById('supervisor').value;
+                const supervisorTel = document.getElementById('supervisor_tel').value;
+                const tecnico = document.getElementById('tecnico').value;
+                const tecnicoTel = document.getElementById('tecnico_tel').value;
+                const prevChegada = document.getElementById('acionamento_prev_chegada').value;
+                const site = document.getElementById('acionamento_site').value;
+                const analista = document.getElementById('acionamento_analista').value;
+                const idOcorrencia = document.getElementById('id_ocorrencia').value;
+                const cargo = document.getElementById('escalonamento_cargo').value;
+                const nomeTel = document.getElementById('escalonamento_nome_tel').value;
+                const sla = document.getElementById('escalonamento_sla').value;
+                const obs = document.getElementById('escalonamento_obs').value;
+                const analistaEsc = document.getElementById('escalonamento_analista').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+1 – ACIONAMENTO
+═══════════════════════════════════════════════════════════
+
+SUPERVISOR: ${supervisor}
+Telefone: ${supervisorTel}
+
+TÉCNICO: ${tecnico}
+Telefone: ${tecnicoTel}
+
+Previsão de chegada ao SITE/ARO para medições: ${prevChegada}
+Nome SITE/ARO para medições: ${site}
+
+Analista CCR: ${analista}
+ID Ocorrência: ${idOcorrencia}
+
+───────────────────────────────────────────────────────────
+ESCALONAMENTO SEM EQUIPE
+───────────────────────────────────────────────────────────
+
+Cargo: ${cargo}
+Nome/Tel.: ${nomeTel}
+SLA do evento: ${sla}
+Obs.: ${obs}
+
+Analista CCR: ${analistaEsc}
+═══════════════════════════════════════════════════════════
+`;
+            } else if (tabName === 'tab1b') {
+                const cargo = document.getElementById('escalonamento_cargo').value;
+                const nomeTel = document.getElementById('escalonamento_nome_tel').value;
+                const sla = document.getElementById('escalonamento_sla').value;
+                const obs = document.getElementById('escalonamento_obs').value;
+                const analista = document.getElementById('escalonamento_analista').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+ESCALONAMENTO SEM EQUIPE
+═══════════════════════════════════════════════════════════
+
+Cargo: ${cargo}
+Nome/Tel.: ${nomeTel}
+SLA do evento: ${sla}
+Obs.: ${obs}
+
+Analista CCR: ${analista}
+═══════════════════════════════════════════════════════════
+`;
+            } else if (tabName === 'tab2') {
+                const supervisor = document.getElementById('supervisor2').value;
+                const supervisorTel = document.getElementById('supervisor_tel2').value;
+                const tecnico = document.getElementById('tecnico2').value;
+                const tecnicoTel = document.getElementById('tecnico_tel2').value;
+                const km = document.getElementById('deslocamento_km').value;
+                const prevChegada = document.getElementById('deslocamento_prev_chegada').value;
+                const obs = document.getElementById('deslocamento_obs').value;
+                const analista = document.getElementById('deslocamento_analista').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+2 - DESLOCAMENTO AO PONTO DA FALHA
+═══════════════════════════════════════════════════════════
+
+SUPERVISOR: ${supervisor}
+Telefone: ${supervisorTel}
+
+TÉCNICO: ${tecnico}
+Telefone: ${tecnicoTel}
+
+KM até o LOCAL da falha: ${km} km
+Previsão de chegada ao LOCAL da falha: ${prevChegada}
+
+Obs.: ${obs}
+
+Analista CCR: ${analista}
+═══════════════════════════════════════════════════════════
+`;
+            } else if (tabName === 'tab3') {
+                const supervisor = document.getElementById('supervisor3').value;
+                const supervisorTel = document.getElementById('supervisor_tel3').value;
+                const tecnico = document.getElementById('tecnico3').value;
+                const tecnicoTel = document.getElementById('tecnico_tel3').value;
+                const causa = document.getElementById('recuperacao_causa').value;
+                const prevTestes = document.getElementById('recuperacao_prev_testes').value;
+                const tratativas = document.getElementById('recuperacao_tratativas').value;
+                const endereco = document.getElementById('recuperacao_endereco').value;
+                const cabo = document.getElementById('recuperacao_cabo').value;
+                const obs = document.getElementById('recuperacao_obs').value;
+                const analista = document.getElementById('recuperacao_analista').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+3 - RECUPERAÇÃO DA FALHA
+═══════════════════════════════════════════════════════════
+
+SUPERVISOR: ${supervisor}
+Telefone: ${supervisorTel}
+
+TÉCNICO: ${tecnico}
+Telefone: ${tecnicoTel}
+
+Causa raiz:
+${causa}
+
+Previsão para solicitação de testes: ${prevTestes}
+
+Tratativas:
+${tratativas}
+
+Endereço da falha: ${endereco}
+Cabo/Capacidade/ARO: ${cabo}
+
+Obs.: ${obs}
+
+Analista CCR: ${analista}
+═══════════════════════════════════════════════════════════
+`;
+            } else if (tabName === 'tab3b') {
+                const motivo = document.getElementById('complementar_motivo').value;
+                const info = document.getElementById('complementar_info').value;
+                const novaPrevisao = document.querySelector('input[name="nova_previsao"]:checked')?.value || '';
+                const previsao = document.getElementById('complementar_previsao').value;
+                const analista = document.getElementById('complementar_analista').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+3B - COMPLEMENTAR
+═══════════════════════════════════════════════════════════
+
+Motivo: ${motivo}
+Informação: ${info}
+Nova previsão: [${novaPrevisao}]
+Previsão: ${previsao}
+
+Analista CCR: ${analista}
+═══════════════════════════════════════════════════════════
+`;
+            } else if (tabName === 'tab4') {
+                const supervisor = document.getElementById('supervisor4').value;
+                const supervisorTel = document.getElementById('supervisor_tel4').value;
+                const tecnico = document.getElementById('tecnico4').value;
+                const tecnicoTel = document.getElementById('tecnico_tel4').value;
+                const tratativa = document.getElementById('certificacao_tratativa').value;
+                const causa = document.getElementById('certificacao_causa').value;
+                const material = document.getElementById('certificacao_material').value;
+                const foto = document.querySelector('input[name="certificacao_foto"]:checked')?.value || '';
+                const analista = document.getElementById('certificacao_analista').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+4 – SOLICITAÇÃO DE CERTIFICAÇÃO
+═══════════════════════════════════════════════════════════
+
+SUPERVISOR: ${supervisor}
+Telefone: ${supervisorTel}
+
+TÉCNICO: ${tecnico}
+Telefone: ${tecnicoTel}
+
+Tratativa realizada:
+${tratativa}
+
+Causa: ${causa}
+Material utilizado: ${material}
+
+Foto em anexo: [${foto}]
+
+Analista CCR: ${analista}
+═══════════════════════════════════════════════════════════
+`;
+            } else if (tabName === 'tab5') {
+                const supervisor = document.getElementById('supervisor5').value;
+                const supervisorTel = document.getElementById('supervisor_tel5').value;
+                const tecnico = document.getElementById('tecnico5').value;
+                const tecnicoTel = document.getElementById('tecnico_tel5').value;
+                const motivo = document.getElementById('nao_falha_motivo').value;
+                const foto = document.querySelector('input[name="nao_falha_foto"]:checked')?.value || '';
+                const gestor = document.getElementById('nao_falha_gestor').value;
+                const analista = document.getElementById('nao_falha_analista').value;
+                const cargo = document.getElementById('escalonamento_prazo_cargo').value;
+                const nomeTel = document.getElementById('escalonamento_prazo_nome_tel').value;
+                const sla = document.getElementById('escalonamento_prazo_sla').value;
+                const obs = document.getElementById('escalonamento_prazo_obs').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+NÃO HÁ FALHA PARA REDE
+═══════════════════════════════════════════════════════════
+
+SUPERVISOR: ${supervisor}
+Telefone: ${supervisorTel}
+
+TÉCNICO: ${tecnico}
+Telefone: ${tecnicoTel}
+
+Motivo da Improdutiva:
+${motivo}
+
+Foto em anexo: [${foto}]
+
+Ciente (Gestor VIVO Rede): ${gestor}
+
+Analista CCR: ${analista}
+
+───────────────────────────────────────────────────────────
+ESCALONAMENTO PRAZO REPARO
+───────────────────────────────────────────────────────────
+
+Cargo: ${cargo}
+Nome/Tel.: ${nomeTel}
+SLA do evento: ${sla}
+Obs.: ${obs}
+═══════════════════════════════════════════════════════════
+`;
+            } else if (tabName === 'tab6') {
+                const solicitante = document.getElementById('cire_solicitante').value;
+                const contato = document.querySelector('input[name="cire_contato"]:checked')?.value || '';
+                const motivo = document.getElementById('cire_motivo').value;
+                const info = document.getElementById('cire_info').value;
+                const previsao = document.getElementById('cire_previsao').value;
+                const analista = document.getElementById('cire_analista').value;
+
+                stamp = `
+═══════════════════════════════════════════════════════════
+INTERVENÇÃO CIRE
+═══════════════════════════════════════════════════════════
+
+Solicitante: ${solicitante}
+
+Meio de contato: [${contato}]
+
+Motivo:
+${motivo}
+
+Informação:
+${info}
+
+Previsão: ${previsao}
+
+Analista CCR: ${analista}
+═══════════════════════════════════════════════════════════
+`;
+            }
+
+            document.getElementById('outputText').textContent = stamp;
+            document.getElementById('output').classList.add('active');
+            document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyToClipboard() {
+            const outputText = document.getElementById('outputText').textContent;
+            navigator.clipboard.writeText(outputText).then(() => {
+                const msg = document.getElementById('successMessage');
+                msg.classList.add('show');
+                setTimeout(() => msg.classList.remove('show'), 3000);
+            }).catch(err => {
+                alert('Erro ao copiar: ' + err);
+            });
+        }
+
+        function sendToWhatsApp() {
+            const outputText = document.getElementById('outputText').textContent;
+            if (!outputText.trim()) {
+                alert('Nenhum carimbo gerado. Gere o carimbo primeiro.');
+                return;
+            }
+            const encodedText = encodeURIComponent(outputText);
+            const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function clearTab(tabName) {
+            const inputs = document.querySelectorAll(`#${tabName} input, #${tabName} textarea`);
+            inputs.forEach(input => {
+                if (input.type === 'radio' || input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+            document.getElementById('output').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
