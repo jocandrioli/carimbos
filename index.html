@@ -870,9 +870,7 @@
                 const analistaEsc = document.getElementById('escalonamento_analista').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
 1 – ACIONAMENTO
-═══════════════════════════════════════════════════════════
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -886,17 +884,6 @@ Nome SITE/ARO para medições: ${site}
 Analista CCR: ${analista}
 ID Ocorrência: ${idOcorrencia}
 
-───────────────────────────────────────────────────────────
-ESCALONAMENTO SEM EQUIPE
-───────────────────────────────────────────────────────────
-
-Cargo: ${cargo}
-Nome/Tel.: ${nomeTel}
-SLA do evento: ${sla}
-Obs.: ${obs}
-
-Analista CCR: ${analistaEsc}
-═══════════════════════════════════════════════════════════
 `;
             } else if (tabName === 'tab1b') {
                 const cargo = document.getElementById('escalonamento_cargo').value;
@@ -906,9 +893,7 @@ Analista CCR: ${analistaEsc}
                 const analista = document.getElementById('escalonamento_analista').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
 ESCALONAMENTO SEM EQUIPE
-═══════════════════════════════════════════════════════════
 
 Cargo: ${cargo}
 Nome/Tel.: ${nomeTel}
@@ -916,7 +901,6 @@ SLA do evento: ${sla}
 Obs.: ${obs}
 
 Analista CCR: ${analista}
-═══════════════════════════════════════════════════════════
 `;
             } else if (tabName === 'tab2') {
                 const supervisor = document.getElementById('supervisor2').value;
@@ -929,9 +913,8 @@ Analista CCR: ${analista}
                 const analista = document.getElementById('deslocamento_analista').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
+
 2 - DESLOCAMENTO AO PONTO DA FALHA
-═══════════════════════════════════════════════════════════
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -945,7 +928,6 @@ Previsão de chegada ao LOCAL da falha: ${prevChegada}
 Obs.: ${obs}
 
 Analista CCR: ${analista}
-═══════════════════════════════════════════════════════════
 `;
             } else if (tabName === 'tab3') {
                 const supervisor = document.getElementById('supervisor3').value;
@@ -961,9 +943,7 @@ Analista CCR: ${analista}
                 const analista = document.getElementById('recuperacao_analista').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
 3 - RECUPERAÇÃO DA FALHA
-═══════════════════════════════════════════════════════════
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -985,7 +965,6 @@ Cabo/Capacidade/ARO: ${cabo}
 Obs.: ${obs}
 
 Analista CCR: ${analista}
-═══════════════════════════════════════════════════════════
 `;
             } else if (tabName === 'tab3b') {
                 const motivo = document.getElementById('complementar_motivo').value;
@@ -995,9 +974,7 @@ Analista CCR: ${analista}
                 const analista = document.getElementById('complementar_analista').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
 3B - COMPLEMENTAR
-═══════════════════════════════════════════════════════════
 
 Motivo: ${motivo}
 Informação: ${info}
@@ -1005,7 +982,6 @@ Nova previsão: [${novaPrevisao}]
 Previsão: ${previsao}
 
 Analista CCR: ${analista}
-═══════════════════════════════════════════════════════════
 `;
             } else if (tabName === 'tab4') {
                 const supervisor = document.getElementById('supervisor4').value;
@@ -1019,9 +995,7 @@ Analista CCR: ${analista}
                 const analista = document.getElementById('certificacao_analista').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
 4 – SOLICITAÇÃO DE CERTIFICAÇÃO
-═══════════════════════════════════════════════════════════
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -1038,7 +1012,7 @@ Material utilizado: ${material}
 Foto em anexo: [${foto}]
 
 Analista CCR: ${analista}
-═══════════════════════════════════════════════════════════
+
 `;
             } else if (tabName === 'tab5') {
                 const supervisor = document.getElementById('supervisor5').value;
@@ -1055,9 +1029,7 @@ Analista CCR: ${analista}
                 const obs = document.getElementById('escalonamento_prazo_obs').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
 NÃO HÁ FALHA PARA REDE
-═══════════════════════════════════════════════════════════
 
 SUPERVISOR: ${supervisor}
 Telefone: ${supervisorTel}
@@ -1074,15 +1046,12 @@ Ciente (Gestor VIVO Rede): ${gestor}
 
 Analista CCR: ${analista}
 
-───────────────────────────────────────────────────────────
 ESCALONAMENTO PRAZO REPARO
-───────────────────────────────────────────────────────────
 
 Cargo: ${cargo}
 Nome/Tel.: ${nomeTel}
 SLA do evento: ${sla}
 Obs.: ${obs}
-═══════════════════════════════════════════════════════════
 `;
             } else if (tabName === 'tab6') {
                 const solicitante = document.getElementById('cire_solicitante').value;
@@ -1093,9 +1062,7 @@ Obs.: ${obs}
                 const analista = document.getElementById('cire_analista').value;
 
                 stamp = `
-═══════════════════════════════════════════════════════════
 INTERVENÇÃO CIRE
-═══════════════════════════════════════════════════════════
 
 Solicitante: ${solicitante}
 
@@ -1110,7 +1077,6 @@ ${info}
 Previsão: ${previsao}
 
 Analista CCR: ${analista}
-═══════════════════════════════════════════════════════════
 `;
             }
 
