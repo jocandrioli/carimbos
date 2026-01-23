@@ -696,7 +696,7 @@ Tratativa realizada: ${tratativa}<br>\nCausa: ${causa}<br>\nMaterial utilizado: 
         const info = document.getElementById("complementar_info").value;
         const novaPrevisao = document.querySelector("input[name='nova_previsao']:checked")?.value || "";
         const previsao = document.getElementById("complementar_previsao").value;
-        stamp = `3B – COMPLEMENTAR<br>
+        stamp = `COMPLEMENTAR<br>
 <br>
 ID Ocorrência: ${idOcorrencia}<br>
 Motivo: ${motivo}<br>\nInformação: ${info}<br>\nNova previsão? ${novaPrevisao}<br>\nPrevisão: ${previsao}<br>\nAnalista CCR: ${analistaCCR}`.trim();
@@ -725,7 +725,7 @@ TA: ${ta}<br>\nCONTRATO: ${contrato}<br>\nTRANSBORDO: ${transbordo}<br>\nAnalist
         const nomeTel = document.getElementById("prazoreparonometel").value;
         const sla = document.getElementById("prazoreparosla").value;
         const obs = document.getElementById("prazoreparoobs").value;
-        stamp = `PRAZO DE REPARO<br>
+        stamp = `ESCALONAMENTO PRAZO REPARO<br>
 <br>
 ID Ocorrência: ${idOcorrencia}<br>
 SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
