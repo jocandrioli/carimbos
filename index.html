@@ -86,145 +86,21 @@
         </div>
       </div>
 
-      
-<!-- Estrutura do formulário -->
-<form id="meuFormulario" novalidate>
-  <div class="form-group">
-    <label for="supervisor">SUPERVISOR</label>
-    <input
-      type="text"
-      id="supervisor"
-      name="supervisor"
-      list="supervisorList"
-      placeholder="Nome do Supervisor"
-      required
-      aria-describedby="supervisorHelp supervisorError"
-      autocomplete="off"
-    />
-
-    <datalist id="supervisorList">
-      <option value="Alexandre Ilha"></option>
-      <option value="Diego Jaworski"></option>
-      <option value="Diego Richter"></option>
-      <option value="Marcio Mendes"></option>
-      <option value="Mário Pereira"></option>
-      <option value="Rodrigo Duarte"></option>
-      <option value="Rodrigo Rosa"></option>
-    </datalist>
-
-    <small id="supervisorHelp" class="help-text">
-      Digite para pesquisar e selecione um nome da lista.
-    </small>
-    <div id="supervisorError" class="error-text" role="alert" aria-live="polite"></div>
-  </div>
-
-  <button type="submit">Enviar</button>
-</form>
-
-<style>
-  .form-group { margin-bottom: 1rem; max-width: 420px; }
-  label { display:block; font-weight:600; margin-bottom: .375rem; }
-  input { width:100%; padding:.5rem .625rem; font-size:1rem; }
-  .help-text { color:#555; display:block; margin-top:.25rem; }
-  .error-text { color:#b00020; margin-top:.25rem; min-height:1em; }
-  .is-invalid { border-color:#b00020; outline-color:#b00020; }
-</style>
-
-<script>
-  (function() {
-    const input = document.getElementById('supervisor');
-    const datalist = document.getElementById('supervisorList');
-    const form = document.getElementById('meuFormulario');
-    const errorEl = document.getElementById('supervisorError');
-
-    // Obtém valores do datalist
-    function getOptions() {
-      return Array.from(datalist.querySelectorAll('option'))
-        .map(opt => (opt.value || '').trim())
-        .filter(v => v.length > 0);
-    }
-
-    // Escapa caracteres especiais para montar o pattern com segurança
-    function escapeForPattern(text) {
-      // Escapa caracteres especiais de regex (inclui acentos normalmente)
-      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    // Seta pattern (regex OR) com todas as opções
-    function updatePatternFromOptions() {
-      const values = getOptions();
-      if (values.length === 0) {
-        input.removeAttribute('pattern');
-        return;
-      }
-      // Monta pattern como ^(op1|op2|op3)$ para casar exatamente um dos itens
-      const pat = `^(${values.map(escapeForPattern).join('|')})$`;
-      input.setAttribute('pattern', pat);
-    }
-
-    // Verifica se o valor atual é exatamente um dos itens
-    function isValidValue(val) {
-      const values = getOptions();
-      return values.includes((val || '').trim());
-    }
-
-    // Apresenta ou limpa erro
-    function setError(msg) {
-      errorEl.textContent = msg || '';
-      if (msg) {
-        input.classList.add('is-invalid');
-      } else {
-        input.classList.remove('is-invalid');
-      }
-    }
-
-    // Validação imediata ao perder foco / mudar campo
-    function validateAndNormalize() {
-      const val = input.value.trim();
-      if (!val) {
-        setError('Selecione um supervisor da lista.');
-        return false;
-      }
-      if (!isValidValue(val)) {
-        setError('Valor inválido. Escolha um nome exatamente como aparece na lista.');
-        return false;
-      }
-      setError('');
-      return true;
-    }
-
-    // Inicializa
-    updatePatternFromOptions();
-
-    // Revalida quando o usuário interage
-    input.addEventListener('change', validateAndNormalize);
-    input.addEventListener('blur', validateAndNormalize);
-
-    // Enquanto digita, se já estava inválido, tenta limpar o erro quando ficar válido
-    input.addEventListener('input', function() {
-      if (errorEl.textContent) {
-        if (isValidValue(input.value.trim())) setError('');
-      }
-    });
-
-    // Impede envio se inválido
-    form.addEventListener('submit', function(e) {
-      // Garante que o pattern também atue no submit (HTML5), mas fazemos a checagem manual
-      if (!validateAndNormalize()) {
-        e.preventDefault();
-        input.focus();
-      }
-    });
-
-    // Caso você atualize a lista dinamicamente no futuro, chame updatePatternFromOptions();
-    // Exemplo:
-    // const novaOpcao = document.createElement('option');
-    // novaOpcao.value = 'Novo Supervisor';
-    // datalist.appendChild(novaOpcao);
-    // updatePatternFromOptions();
-  })();
-</script>
-
+      <div class="form-group">
+        <div>
+          <label>SUPERVISOR</label>
+          <input type="text" id="supervisor" list="supervisorList" placeholder="Nome do Supervisor">
+          <datalist id="supervisorList">
+            <option value="Alexandre Ilha"></option>
+            <option value="Diego Jaworski"></option>
+            <option value="Diego Richter"></option>
+            <option value="Marcio Mendes"></option>
+            <option value="Mário Pereira"></option>
+            <option value="Rodrigo Duarte"></option>
+            <option value="Rodrigo Rosa"></option>
+          </datalist>
+        </div>
+        <div>
           <label>Telefone Supervisor</label>
           <input type="tel" id="supervisor_tel" placeholder="(51) 9XXXX-XXXX">
         </div>
