@@ -651,24 +651,24 @@
       if (tipo === "acionamento") {
         const prevChegada = document.getElementById("acionamento_prev_chegada").value;
         const site = document.getElementById("acionamento_site").value;
-        stamp = 1 - ACIONAMENTO<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-Previsão de chegada ao SITE/ARO para medições: ${prevChegada}<br>\nNome SITE/ARO para medições: ${site}<br>
+        stamp = '1 - ACIONAMENTO <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+Previsão de chegada ao SITE/ARO para medições: ${prevChegada} <br>\nNome SITE/ARO para medições: ${site} <br>
 Analista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "deslocamento") {
         const km = document.getElementById("deslocamento_km").value;
         const prevChegada = document.getElementById("deslocamento_prev_chegada").value;
         const obs = document.getElementById("deslocamento_obs").value;
-        stamp = 2 - DESLOCAMENTO AO PONTO DA FALHA<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-KM até o LOCAL da falha: ${km} km<br>\nPrevisão de chegada ao LOCAL da falha: ${prevChegada}<br>
-Obs.: ${obs}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = '2 - DESLOCAMENTO AO PONTO DA FALHA <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+KM até o LOCAL da falha: ${km} km <br>\nPrevisão de chegada ao LOCAL da falha: ${prevChegada} <br>
+Obs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "recuperacao") {
         const causa = document.getElementById("recuperacao_causa").value;
         const prevTestes = document.getElementById("recuperacao_prev_testes").value;
@@ -676,84 +676,84 @@ Obs.: ${obs}<br>\nAnalista CCR: ${analistaCCR}`.trim();
         const cabo = document.getElementById("recuperacao_cabo").value;
         const tratativas = document.getElementById("recuperacao_tratativas").value;
         const obs = document.getElementById("recuperacao_obs").value;
-        stamp = 3 - RECUPERAÇÃO DA FALHA<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-Causa raiz: ${causa}<br>\nPrevisão para solicitação de testes: ${prevTestes}<br>\nEndereço da falha: ${endereco}<br>\nCabo/Capacidade/ARO: ${cabo}<br>
-Tratativas realizadas: ${tratativas}<br>
-Obs.: ${obs}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = '3 - RECUPERAÇÃO DA FALHA <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+Causa raiz: ${causa} <br>\nPrevisão para solicitação de testes: ${prevTestes} <br>\nEndereço da falha: ${endereco} <br>\nCabo/Capacidade/ARO: ${cabo} <br>
+Tratativas realizadas: ${tratativas} <br>
+Obs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "certificacao") {
         const tratativa = document.getElementById("certificacao_tratativa").value;
         const causa = document.getElementById("certificacao_causa").value;
         const material = document.getElementById("certificacao_material").value;
         const foto = document.querySelector("input[name='certificacao_foto']:checked")?.value || "";
-        stamp = 4 - SOLICITAÇÃO DE CERTIFICAÇÃO<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-Tratativa realizada: ${tratativa}<br>\nCausa: ${causa}<br>\nMaterial utilizado: ${material}<br>\nFoto em anexo: ${foto}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = '4 - SOLICITAÇÃO DE CERTIFICAÇÃO <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+Tratativa realizada: ${tratativa} <br>\nCausa: ${causa} <br>\nMaterial utilizado: ${material} <br>\nFoto em anexo: ${foto} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "complementar") {
         const motivo = document.getElementById("complementar_motivo").value;
         const info = document.getElementById("complementar_info").value;
         const novaPrevisao = document.querySelector("input[name='nova_previsao']:checked")?.value || "";
         const previsao = document.getElementById("complementar_previsao").value;
-        stamp = COMPLEMENTAR<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-Motivo: ${motivo}<br>\nInformação: ${info}<br>\nNova previsão? ${novaPrevisao}<br>\nPrevisão: ${previsao}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = 'COMPLEMENTAR <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+Motivo: ${motivo} <br>\nInformação: ${info} <br>\nNova previsão? ${novaPrevisao} <br>\nPrevisão: ${previsao} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "naofalha") {
         const motivo = document.getElementById("naofalha_motivo").value;
         const foto = document.querySelector("input[name='naofalha_foto']:checked")?.value || "";
         const gestor = document.getElementById("naofalha_gestor").value;
-        stamp = NÃO HÁ FALHA PARA REDE<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-Motivo da improdutiva: ${motivo}<br>\nFoto em anexo: ${foto}<br>\nCiente (Gestor VIVO Rede): ${gestor}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = 'NÃO HÁ FALHA PARA REDE <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+Motivo da improdutiva: ${motivo} <br>\nFoto em anexo: ${foto} <br>\nCiente (Gestor VIVO Rede): ${gestor} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "transbordo") {
         const ta = document.getElementById("transbordota").value;
         const contrato = document.getElementById("transbordocontrato").value;
         const transbordo = document.getElementById("transbordooperadora").value;
-        stamp = TRANSBORDO<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-TA: ${ta}<br>\nCONTRATO: ${contrato}<br>\nTRANSBORDO: ${transbordo}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = 'TRANSBORDO <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+TA: ${ta} <br>\nCONTRATO: ${contrato} <br>\nTRANSBORDO: ${transbordo} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "prazo") {
         const cargo = document.getElementById("prazoreparocargo").value;
         const nomeTel = document.getElementById("prazoreparonometel").value;
         const sla = document.getElementById("prazoreparosla").value;
         const obs = document.getElementById("prazoreparoobs").value;
-        stamp = ESCALONAMENTO PRAZO REPARO<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-Cargo: ${cargo}<br>\nNome/Tel.: ${nomeTel}<br>\nSLA do evento: ${sla}<br>\nObs.: ${obs}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = 'ESCALONAMENTO PRAZO REPARO <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+Cargo: ${cargo} <br>\nNome/Tel.: ${nomeTel} <br>\nSLA do evento: ${sla} <br>\nObs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "cire") {
         const solicitante = document.getElementById("cire_solicitante").value;
         const contato = document.querySelector("input[name='cire_contato']:checked")?.value || "";
         const motivo = document.getElementById("cire_motivo").value;
         const info = document.getElementById("cire_info").value;
         const previsao = document.getElementById("cire_previsao").value;
-        stamp = INTERVENÇÃO CIRE<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-Solicitante: ${solicitante}<br>\nMeio de contato: ${contato}<br>\nMotivo: ${motivo}<br>\nInformação: ${info}<br>\nPrevisão: ${previsao}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = 'INTERVENÇÃO CIRE <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+Solicitante: ${solicitante} <br>\nMeio de contato: ${contato} <br>\nMotivo: ${motivo} <br>\nInformação: ${info} <br>\nPrevisão: ${previsao} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "escalonamento") {
         const cargo = document.getElementById("escalonamento_cargo").value;
         const nomeTel = document.getElementById("escalonamento_nome_tel").value;
         const sla = document.getElementById("escalonamento_sla").value;
         const obs = document.getElementById("escalonamento_obs").value;
-        stamp = ESCALONAMENTO SEM EQUIPE<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-Cargo: ${cargo}<br>\nNome/Tel.: ${nomeTel}<br>\nSLA do evento: ${sla}<br>\nObs.: ${obs}<br>\nAnalista CCR: ${analistaCCR}`.trim();
+        stamp = 'ESCALONAMENTO SEM EQUIPE <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+Cargo: ${cargo} <br>\nNome/Tel.: ${nomeTel} <br>\nSLA do evento: ${sla} <br>\nObs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
       } else if (tipo === "cto_defeito") {
         const site = document.getElementById("cto_defeito_site").value;
         const splitter = document.getElementById("cto_defeito_splitter").value;
@@ -762,13 +762,13 @@ Cargo: ${cargo}<br>\nNome/Tel.: ${nomeTel}<br>\nSLA do evento: ${sla}<br>\nObs.:
         const causa = document.getElementById("cto_defeito_causa").value;
         const tratativa = document.getElementById("cto_defeito_tratativa").value;
         const material = document.getElementById("cto_defeito_material").value;
-        stamp = CTO COM DEFEITO<br>
-<br>
-ID Ocorrência: ${idOcorrencia}<br>
-SUPERVISOR: ${supervisor}<br>\nTelefone: ${supervisorTel}<br>
-TÉCNICO: ${tecnico}<br>\nTelefone: ${tecnicoTel}<br>
-Nome SITE/ARO: ${site}<br>\nSplitter: ${splitter}<br>\nCaixa: ${caixa}<br>\nEndereço: ${endereco}<br>\nCausa: ${causa}<br>
-Tratativa realizada: ${tratativa}<br>\nMaterial utilizado: ${material}<br>
+        stamp = 'CTO COM DEFEITO <br>
+ <br>
+ID Ocorrência: ${idOcorrencia} <br>
+SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
+TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
+Nome SITE/ARO: ${site} <br>\nSplitter: ${splitter} <br>\nCaixa: ${caixa} <br>\nEndereço: ${endereco} <br>\nCausa: ${causa} <br>
+Tratativa realizada: ${tratativa} <br>\nMaterial utilizado: ${material} <br>
 Analista CCR: ${analistaCCR}`.trim();
       }
 
