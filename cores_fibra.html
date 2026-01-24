@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Cores de Fibra Óptica</title>
+<style>
+       :root {
+           --primary: #2c3e50;
+           --secondary: #34495e;
+           --accent: #3498db;
+       }
+       body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; color: #333; margin: 20px; }
+       .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+       h2 { color: var(--primary); text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+       .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+       .form-group { display: flex; flex-direction: column; }
+       label { font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+       select, input { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+       button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+       button:hover { background: #2980b9; }
+       table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+       th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+       th { background: var(--secondary); color: white; }
+       tr:nth-child(even) { background: #f9f9f9; }
+       .color-box { display: inline-block; width: 25px; height: 15px; border: 1px solid #000; vertical-align: middle; margin-right: 8px; border-radius: 2px; }
+       .fiber-name { display: flex; align-items: center; justify-content: flex-start; }
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Código de Cores de Fibras Ópticas</h2>
+<div class="config-grid">
+<div class="form-group">
+<label>Padrão de Cores</label>
+<select id="standard">
+<option value="abnt">ABNT (Nacional)</option>
+<option value="eia">EIA/TIA-598 (Internacional)</option>
+</select>
+</div>
+<div class="form-group">
+<label>Capacidade do Cabo</label>
+<select id="totalFibers">
+<option value="12">12F</option>
+<option value="24">24F</option>
+<option value="36">36F</option>
+<option value="48">48F</option>
+<option value="72">72F</option>
+<option value="96">96F</option>
+<option value="144" selected>144F</option>
+<option value="288">288F</option>
+</select>
+</div>
+<div class="form-group">
+<label>Fibras por Tubo (Loose)</label>
+<select id="fibersPerTube">
+<option value="6">6 Fibras</option>
+<option value="12" selected>12 Fibras</option>
+</select>
+</div>
+<div class="form-group">
+<label>Contagem Inicial (Fibra 1)</label>
+<input type="number" id="startCount" value="1" min="1">
+</div>
+</div>
+<button onclick="generateTable()">Gerar Tabela de Contagem</button>
+<div id="result"></div>
+</div>
+<script>
+   const colors = {
+       abnt: [
+           { n: "Verde", hex: "#008000" }, { n: "Amarelo", hex: "#ffff00" }, { n: "Branco", hex: "#ffffff" },
+           { n: "Azul", hex: "#0000ff" }, { n: "Vermelho", hex: "#ff0000" }, { n: "Violeta", hex: "#ee82ee" },
+           { n: "Marrom", hex: "#a52a2a" }, { n: "Rosa", hex: "#ffc0cb" }, { n: "Preto", hex: "#000000" },
+           { n: "Cinza", hex: "#808080" }, { n: "Laranja", hex: "#ffa500" }, { n: "Turquesa", hex: "#40e0d0" }
+       ],
+       eia: [
+           { n: "Azul", hex: "#0000ff" }, { n: "Laranja", hex: "#ffa500" }, { n: "Verde", hex: "#008000" },
+           { n: "Marrom", hex: "#a52a2a" }, { n: "Cinza", hex: "#808080" }, { n: "Branco", hex: "#ffffff" },
+           { n: "Vermelho", hex: "#ff0000" }, { n: "Preto", hex: "#000000" }, { n: "Amarelo", hex: "#ffff00" },
+           { n: "Violeta", hex: "#ee82ee" }, { n: "Rosa", hex: "#ffc0cb" }, { n: "Aqua (Turquesa)", hex: "#00ffff" }
+       ]
+   };
+   function generateTable() {
+       const std = document.getElementById('standard').value;
+       const total = parseInt(document.getElementById('totalFibers').value);
+       const perTube = parseInt(document.getElementById('fibersPerTube').value);
+       const start = parseInt(document.getElementById('startCount').value);
+       const colorSet = colors[std];
+       let html = `<table>
+<tr>
+<th>Tubo</th>
+<th>Fibra (Tubo)</th>
+<th>Cor da Fibra</th>
+<th>Contagem Geral</th>
+</tr>`;
+       for (let i = 0; i < total; i++) {
+           const tubeNum = Math.floor(i / perTube) + 1;
+           const fiberInTube = (i % perTube) + 1;
+           const colorIdx = i % 12; // As cores repetem a cada 12
+           const tubeColorIdx = (tubeNum - 1) % 12;
+           const absoluteCount = start + i;
+           // Lógica simplificada de cor de tubo: EIA colore todos, ABNT usa piloto/direcional (Verde/Amarelo/Branco)
+           let tubeDisplay = `Tubo ${tubeNum}`;
+           if (std === 'eia') {
+               tubeDisplay = `<div class="fiber-name"><span class="color-box" style="background:${colorSet[tubeColorIdx].hex}"></span> Tubo ${tubeNum} (${colorSet[tubeColorIdx].n})</div>`;
+           } else {
+               let tColor = "Branco";
+               let tHex = "#fff";
+               if (tubeNum === 1) { tColor = "Verde"; tHex = "#008000"; }
+               if (tubeNum === 2) { tColor = "Amarelo"; tHex = "#ffff00"; }
+               tubeDisplay = `<div class="fiber-name"><span class="color-box" style="background:${tHex}"></span> Tubo ${tubeNum} (${tColor})</div>`;
+           }
+           html += `<tr>
+<td>${fiberInTube === 1 ? tubeDisplay : '-'}</td>
+<td>${fiberInTube}</td>
+<td class="fiber-name">
+<span class="color-box" style="background:${colorSet[colorIdx].hex}"></span>
+                   ${colorSet[colorIdx].n}
+</td>
+<td><strong>${absoluteCount}</strong></td>
+</tr>`;
+       }
+       html += '</table>';
+       document.getElementById('result').innerHTML = html;
+   }
+</script>
+</body>
+</html>
