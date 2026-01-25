@@ -5,806 +5,787 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gerador de Carimbo - Acionamento GPON</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px; line-height: 1.6; }
-    .container { max-width: 1000px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; }
-    .header { background: #003366; color: #fff; padding: 20px; text-align: center; }
-    .header h1 { font-size: 24px; margin-bottom: 5px; }
-    .header p { font-size: 12px; opacity: .9; }
-    .form-group { margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-group.full { grid-template-columns: 1fr; }
-    .form-group.three-col { grid-template-columns: 1fr 1fr 1fr; }
-    label { display: block; font-size: 12px; font-weight: 700; color: #333; margin-bottom: 4px; }
-    input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], input[type="time"], textarea, select {
-      width: 100%; padding: 8px; border: 1px solid #999; border-radius: 4px; font-size: 12px; font-family: Arial, sans-serif;
-    }
-    textarea { resize: vertical; min-height: 60px; }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: #ff6600; background: #fffef0; }
-    .section { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; }
-    .section-title { font-weight: 700; color: #003366; margin-bottom: 12px; font-size: 14px; border-bottom: 2px solid #ff6600; padding-bottom: 8px; }
-    .header-section { background: #f9f9f9; padding: 20px; border-bottom: 2px solid #004d99; }
-    .header-section h2 { color: #003366; font-size: 16px; margin-bottom: 15px; }
-    .dynamic-content { padding: 20px; display: none; }
-    .dynamic-content.active { display: block; }
-    .checkbox-group { display: flex; gap: 15px; margin-top: 8px; }
-    .checkbox-group label { display: inline-flex; align-items: center; margin-bottom: 0; font-weight: 600; }
-    .checkbox-group input[type="checkbox"], .checkbox-group input[type="radio"] { width: auto; margin-right: 6px; }
-    .actions { display: flex; gap: 10px; margin-top: 20px; justify-content: space-between; flex-wrap: wrap; }
-    button { padding: 10px 20px; font-size: 12px; border: 0; border-radius: 4px; cursor: pointer; font-weight: 700; transition: .3s; }
-    .btn-generate { background: #ff6600; color: #fff; flex: 1; min-width: 120px; }
-    .btn-generate:hover { background: #e55a00; }
-    .btn-copy { background: #0066cc; color: #fff; flex: 1; min-width: 120px; }
-    .btn-copy:hover { background: #0052a3; }
-    .btn-clear { background: #999; color: #fff; flex: 1; min-width: 120px; }
-    .btn-clear:hover { background: #777; }
-    .output-section { margin-top: 20px; padding: 15px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: none; }
-    .output-section.active { display: block; }
-    .output-section h3 { color: #003366; margin-bottom: 10px; font-size: 14px; }
-    .output-text { background: #fff; padding: 12px; border: 1px solid #999; border-radius: 4px; font-family: "Courier New", monospace; font-size: 11px; line-height: 1.6; color: #333; max-height: 300px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
-    .success-message { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 12px; display: none; }
-    .success-message.show { display: block; }
-    @media (max-width: 768px) {
-      .form-group { grid-template-columns: 1fr; }
-      .form-group.three-col { grid-template-columns: 1fr; }
-      .actions { flex-direction: column; }
-      button { width: 100%; }
-    }
+
+/* Autocomplete visível ao digitar (bom no mobile) */
+.suggest-box{
+  position:relative;
+}
+.suggest-list{
+  position:absolute;
+  top: calc(100% + 6px);
+  left:0;
+  right:0;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+  max-height:220px;
+  overflow:auto;
+  z-index:999;
+  display:none;
+}
+.suggest-list.show{display:block;}
+.suggest-item{
+  padding:10px 12px;
+  font-size:14px;
+  cursor:pointer;
+  border-bottom:1px solid #eee;
+}
+.suggest-item:last-child{border-bottom:none;}
+.suggest-item:hover{background:#f6faff;}
+.suggest-muted{color:var(--muted); font-size:12px; padding:10px 12px;}
+
+    :root{--primary:#003366;--primary-2:#004d99;--accent:#ff6600;--info:#0066cc;--bg:#f5f5f5;--panel:#fafafa;--text:#333;--muted:#666;--border:#ddd;--border-2:#999;--radius:8px}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;background:var(--bg);padding:20px;line-height:1.6;color:var(--text)}
+    .container{max-width:1000px;margin:0 auto;background:#fff;border-radius:var(--radius);box-shadow:0 2px 8px rgba(0,0,0,.1);overflow:hidden}
+    .header{background:var(--primary);color:#fff;padding:20px;text-align:center}
+    .header h1{font-size:24px;margin-bottom:5px}
+    .header p{font-size:12px;opacity:.9}
+    .header-section{background:#f9f9f9;padding:20px;border-bottom:2px solid var(--primary-2)}
+    .header-section h2{color:var(--primary);font-size:16px;margin-bottom:15px}
+    .section{margin-bottom:20px;padding:15px;border:1px solid var(--border);border-radius:4px;background:var(--panel)}
+    .section-title{font-weight:700;color:var(--primary);margin-bottom:12px;font-size:14px;border-bottom:2px solid var(--accent);padding-bottom:8px}
+    .dynamic-content{padding:20px}
+    .dynamic-content .hint{color:var(--muted);text-align:center;padding:40px 20px}
+    .form-group{margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-group.full{grid-template-columns:1fr}
+    .form-group.three-col{grid-template-columns:1fr 1fr 1fr}
+    label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+    input[type="text"],input[type="tel"],input[type="number"],input[type="time"],textarea,select{width:100%;padding:8px;border:1px solid var(--border-2);border-radius:4px;font-size:12px;font-family:Arial,sans-serif}
+    textarea{resize:vertical;min-height:60px}
+    input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fffef0}
+    .checkbox-group{display:flex;gap:15px;margin-top:8px;flex-wrap:wrap}
+    .checkbox-group label{display:inline-flex;align-items:center;margin-bottom:0;font-weight:600}
+    .checkbox-group input{width:auto;margin-right:6px}
+    .actions{display:flex;gap:10px;margin-top:20px;justify-content:space-between;flex-wrap:wrap}
+    button{padding:10px 20px;font-size:12px;border:0;border-radius:4px;cursor:pointer;font-weight:700;transition:.3s}
+    .btn-generate{background:var(--accent);color:#fff;flex:1;min-width:160px}
+    .btn-generate:hover{background:#e55a00}
+    .btn-clear{background:#999;color:#fff;flex:1;min-width:160px}
+    .btn-clear:hover{background:#777}
+    .btn-copy{background:var(--info);color:#fff;flex:1;min-width:160px}
+    .btn-copy:hover{background:#0052a3}
+    .output-section{margin:20px;padding:15px;background:#f0f0f0;border:1px solid var(--border);border-radius:4px;display:none}
+    .output-section.active{display:block}
+    .output-section h3{color:var(--primary);margin-bottom:10px;font-size:14px}
+    .output-text{background:#fff;padding:12px;border:1px solid var(--border-2);border-radius:4px;font-family:"Courier New",monospace;font-size:11px;line-height:1.6;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+    .success-message{background:#d4edda;color:#155724;padding:10px;border-radius:4px;margin-top:10px;font-size:12px;display:none}
+    .success-message.show{display:block}
+    .mini{font-size:11px;color:var(--muted)}
+    .tags-wrap{border:1px solid var(--border-2);border-radius:4px;padding:6px;background:#fff}
+    .tags-row{display:flex;gap:8px;align-items:center}
+    .tags-row input{border:1px solid var(--border);flex:1}
+    .tags-row .btn-add{padding:8px 10px;flex:0;background:var(--info)}
+
+    .materials-wrap{border:1px solid var(--border-2);border-radius:4px;padding:10px;background:#fff}
+    .materials-list{margin-bottom:12px;max-height:250px;overflow-y:auto}
+    .materials-list table{width:100%;border-collapse:collapse;font-size:12px}
+    .materials-list table th,.materials-list table td{border:1px solid var(--border);padding:6px;text-align:left}
+    .materials-list table th{background:#f0f0f0;font-weight:700}
+    .materials-add{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .materials-add select,.materials-add input{padding:8px;border:1px solid var(--border-2);border-radius:4px;font-size:12px}
+    .materials-add select{flex:1;min-width:200px}
+    .materials-add input[type="number"]{width:80px}
+    .materials-empty{color:var(--muted);padding:8px 0;font-size:12px}
+
+    /* ✅ Tabela de técnicos substituindo chips */
+    .tech-table { margin-top: 10px; }
+    .tech-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .tech-table th, .tech-table td { border: 1px solid var(--border); padding: 6px; text-align: left; }
+    .tech-table th { background: #f0f0f0; font-weight: 700; }
+    .tech-table .btn-x { background: transparent; border: none; cursor: pointer; color: var(--accent); font-weight: 700; }
+    .tech-table .muted { color: var(--muted); font-size: 12px; padding: 6px 0; }
+
+    @media (max-width:768px){.form-group{grid-template-columns:1fr}.form-group.three-col{grid-template-columns:1fr}.actions{flex-direction:column}button{width:100%}.tags-row{flex-direction:column;align-items:stretch}.tags-row .btn-add{width:100%}.materials-add{flex-direction:column;align-items:stretch}.materials-add select,.materials-add input{width:100%}}
   </style>
 </head>
-
 <body>
   <div class="container">
     <div class="header">
       <h1>📋 Gerador de Carimbo - RS-CAPITAL</h1>
       <p>Sistema de Acionamento - GPON - Vivo Rede</p>
     </div>
-
     <div class="header-section">
       <h2>Dados Gerais (Preenchidos para todos os carimbos)</h2>
-
-      <div class="form-group">
-        <div>
-          <label>ID Ocorrência/OS CTO (BA/TT)</label>
-          <input type="text" id="id_ocorrencia" placeholder="Ex: 123456">
-        </div>
-        <div>
-          <label>Selecione o Tipo de Carimbo</label>
-          <select id="carimbo_tipo">
-            <option value="">-- Selecione --</option>
-            <option value="acionamento">1. Acionamento</option>
-            <option value="deslocamento">2. Deslocamento ao Ponto da Falha</option>
-            <option value="recuperacao">3. Recuperação da Falha</option>
-            <option value="certificacao">4. Certificação</option>
-            <option value="complementar">Complementar</option>
-            <option value="naofalha">Não há Falha para Rede</option>
-            <option value="transbordo">Transbordo</option>
-            <option value="prazo">Prazo de Reparo</option>
-            <option value="cire">CIRE</option>
-            <option value="escalonamento">Escalonamento sem Equipe</option>
-            <option value="cto_defeito">CTO com Defeito</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div>
-          <label>SUPERVISOR</label>
-          <input type="text" id="supervisor" list="supervisorList" placeholder="Nome do Supervisor">
-          <datalist id="supervisorList">
-            <option value="Alexandre Ilha"></option>
-            <option value="Diego Jaworski"></option>
-            <option value="Diego Richter"></option>
-            <option value="Marcio Mendes"></option>
-            <option value="Mário Pereira"></option>
-            <option value="Rodrigo Duarte"></option>
-            <option value="Rodrigo Rosa"></option>
-          </datalist>
-        </div>
-        <div>
-          <label>Telefone Supervisor</label>
-          <input type="tel" id="supervisor_tel" placeholder="(51) 9XXXX-XXXX">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div>
-          <label>TÉCNICO</label>
-          <input type="text" id="tecnico" placeholder="Nome do Técnico">
-        </div>
-        <div>
-          <label>Telefone Técnico</label>
-          <input type="tel" id="tecnico_tel" placeholder="(51) 9XXXX-XXXX">
-        </div>
-      </div>
-
-      <div class="form-group full">
-        <div>
-          <label>Analista CCR</label>
-          <input type="text" id="analista_ccr" list="analistaList" placeholder="Digite para pesquisar ou selecione na lista">
-          <datalist id="analistaList">
-            <option value="CARINA DE FATIMA CHUQUEL"></option>
-            <option value="EDMILSON GARCIA RIEIRA"></option>
-            <option value="EDUARDA PAIVA RODRIGUES"></option>
-            <option value="JULIA DOS SANTOS DA SILVA"></option>
-            <option value="MATHEUS ALVES CASTRO"></option>
-            <option value="RAFAELA VERCH DIAS"></option>
-            <option value="SILVIO LUIZ RACHOR PUTRIQUE"></option>
-          </datalist>
-        </div>
-      </div>
+      <div id="baseForm"></div>
+      <div class="mini">* Campos específicos aparecem após selecionar o tipo de carimbo.</div>
     </div>
-
-    <div class="dynamic-content active" id="content-default">
-      <div class="section">
-        <p style="color: #666; text-align: center; padding: 40px 20px;">
-          Selecione um tipo de carimbo acima para ver os campos específicos.
-        </p>
-      </div>
+    <div class="dynamic-content">
+      <div id="dynamicRoot"></div>
     </div>
-
-    <div class="dynamic-content" id="content-acionamento">
-      <div class="section">
-        <div class="section-title">ACIONAMENTO</div>
-        <div class="form-group">
-          <div>
-            <label>Previsão de chegada ao SITE/ARO para medições</label>
-            <input type="time" id="acionamento_prev_chegada">
-          </div>
-          <div>
-            <label>Nome SITE/ARO para medições</label>
-            <input type="text" id="acionamento_site" list="siteList" placeholder="Digite para pesquisar ou selecione na lista">
-            <datalist id="siteList">
-              <option value="RSCBM_G1N01"></option>
-              <option value="RSCBM_O1A01"></option>
-              <option value="RSCQU_G1I01"></option>
-              <option value="RSGUB_G1N01"></option>
-              <option value="RSNHO_G1I02"></option>
-              <option value="RSPAE_G1B95"></option>
-              <option value="RSPAE_G1C01"></option>
-              <option value="RSPAE_G1I22"></option>
-              <option value="RSPAE_G1I23"></option>
-              <option value="RSPAE_G1I24"></option>
-              <option value="RSPAE_G1I25"></option>
-              <option value="RSPAE_G1I26"></option>
-              <option value="RSPAE_G1I32"></option>
-              <option value="RSPAE_G1I33"></option>
-              <option value="RSPAE_G1I35"></option>
-              <option value="RSPAE_G1I41"></option>
-              <option value="RSPAE_G1I47"></option>
-              <option value="RSPAE_G1I48"></option>
-              <option value="RSPAE_G1I51"></option>
-              <option value="RSPAE_G1I55"></option>
-               <option value="RSPAE_G1I57"></option>
-              <option value="RSPAE_G1N42"></option>
-              <option value="RSPAE_G1N45"></option>
-              <option value="RSSLE_G1M01"></option>
-              <option value="RSSLE_O1A04"></option>
-            </datalist>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('acionamento')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-deslocamento">
-      <div class="section">
-        <div class="section-title">DESLOCAMENTO AO PONTO DA FALHA</div>
-        <div class="form-group">
-          <div>
-            <label>KM até o LOCAL da falha</label>
-            <input type="number" id="deslocamento_km" placeholder="Ex: 15.5" step="0.1">
-          </div>
-          <div>
-            <label>Previsão de chegada ao LOCAL da falha</label>
-            <input type="time" id="deslocamento_prev_chegada">
-          </div>
-        </div>
-        <div class="form-group full">
-          <div>
-            <label>Observações</label>
-            <textarea id="deslocamento_obs" placeholder="Observações sobre o deslocamento"></textarea>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('deslocamento')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-recuperacao">
-      <div class="section">
-        <div class="section-title">RECUPERAÇÃO DA FALHA</div>
-        <div class="form-group">
-          <div>
-            <label>Causa raiz</label>
-            <select id="recuperacao_causa">
-              <option value="" disabled selected>Selecione</option>
-              <option value="Abalroamento">Abalroamento</option>
-              <option value="Furto">Furto</option>
-              <option value="Acidente">Acidente</option>
-              <option value="Descarga">Descarga</option>
-              <option value="Vandalismo">Vandalismo</option>
-              <option value="Troca de poste">Troca de poste</option>
-              <option value="Degradação / Infiltração">Degradação / Infiltração</option>
-              <option value="Defeito Splitter">Defeito Splitter</option>
-              <option value="Falha em atividade anterior">Falha em atividade anterior</option>
-              <option value="Obra de terceiros">Obra de terceiros</option>
-              <option value="Interperie">Interperie</option>
-              <option value="Ataque de animais">Ataque de animais</option>
-            </select>
-          </div>
-          <div>
-            <label>Previsão para solicitação de testes</label>
-            <input type="time" id="recuperacao_prev_testes">
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Endereço da falha</label>
-            <input type="text" id="recuperacao_endereco" placeholder="Rua, Número, Complemento">
-          </div>
-          <div>
-            <label>Cabo / Capacidade / ARO</label>
-            <select id="recuperacao_cabo">
-              <option value="" disabled selected>Selecione</option>
-              <option value="Drop Fig8 4F">Drop Fig8 4F</option>
-              <option value="12F">12F</option>
-              <option value="24F">24F</option>
-              <option value="36F">36F</option>
-              <option value="48F">48F</option>
-              <option value="72F">72F</option>
-              <option value="144F">144F</option>
-              <option value="288F">288F</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group full">
-          <div>
-            <label>Tratativas realizadas</label>
-            <textarea id="recuperacao_tratativas" placeholder="Descreva as tratativas"></textarea>
-          </div>
-        </div>
-        <div class="form-group full">
-          <div>
-            <label>Observações</label>
-            <textarea id="recuperacao_obs" placeholder="Observações gerais"></textarea>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('recuperacao')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-certificacao">
-      <div class="section">
-        <div class="section-title">SOLICITAÇÃO DE CERTIFICAÇÃO</div>
-        <div class="form-group full">
-          <div>
-            <label>Tratativa realizada</label>
-            <textarea id="certificacao_tratativa" placeholder="Descrição da tratativa realizada"></textarea>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Causa</label>
-            <select id="certificacao_causa">
-              <option value="" disabled selected>Selecione</option>
-              <option value="Abalroamento">Abalroamento</option>
-              <option value="Furto">Furto</option>
-              <option value="Acidente">Acidente</option>
-              <option value="Descarga">Descarga</option>
-              <option value="Vandalismo">Vandalismo</option>
-              <option value="Troca de poste">Troca de poste</option>
-              <option value="Degradação / Infiltração">Degradação / Infiltração</option>
-              <option value="Defeito Splitter">Defeito Splitter</option>
-              <option value="Falha em atividade anterior">Falha em atividade anterior</option>
-              <option value="Obra de terceiros">Obra de terceiros</option>
-              <option value="Interperie">Interperie</option>
-              <option value="Ataque de animais">Ataque de animais</option>
-            </select>
-          </div>
-          <div>
-            <label>Material utilizado</label>
-            <input type="text" id="certificacao_material" placeholder="Ex: Conector SC, Fibra óptica">
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Foto em anexo</label>
-            <div class="checkbox-group">
-              <label><input type="radio" name="certificacao_foto" value="Sim"> Sim</label>
-              <label><input type="radio" name="certificacao_foto" value="Não"> Não</label>
-            </div>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('certificacao')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-complementar">
-      <div class="section">
-        <div class="section-title">COMPLEMENTAR</div>
-        <div class="form-group">
-          <div>
-            <label>Motivo</label>
-            <input type="text" id="complementar_motivo" placeholder="Motivo da complementação">
-          </div>
-          <div>
-            <label>Informação</label>
-            <input type="text" id="complementar_info" placeholder="Informação adicional">
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Nova previsão?</label>
-            <div class="checkbox-group">
-              <label><input type="radio" name="nova_previsao" value="Sim"> Sim</label>
-              <label><input type="radio" name="nova_previsao" value="Não"> Não</label>
-            </div>
-          </div>
-          <div>
-            <label>Previsão</label>
-            <input type="time" id="complementar_previsao">
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('complementar')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-naofalha">
-      <div class="section">
-        <div class="section-title">NÃO HÁ FALHA PARA REDE</div>
-        <div class="form-group full">
-          <div>
-            <label>Motivo da Improdutiva</label>
-            <textarea id="naofalha_motivo" placeholder="Descreva o motivo da improdutiva"></textarea>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Foto em anexo</label>
-            <div class="checkbox-group">
-              <label><input type="radio" name="naofalha_foto" value="Sim"> Sim</label>
-              <label><input type="radio" name="naofalha_foto" value="Não"> Não</label>
-            </div>
-          </div>
-          <div>
-            <label>Ciente (Gestor VIVO Rede)</label>
-            <input type="text" id="naofalha_gestor" value="João Andrioli" readonly>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('naofalha')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-transbordo">
-      <div class="section">
-        <div class="section-title">TRANSBORDO</div>
-        <div class="form-group">
-          <div>
-            <label>TA</label>
-            <input type="text" id="transbordota" placeholder="TA">
-          </div>
-          <div>
-            <label>CONTRATO</label>
-            <input type="text" id="transbordocontrato" placeholder="Contrato">
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>TRANSBORDO</label>
-            <input type="text" id="transbordooperadora" value="VIVO" readonly>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('transbordo')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-prazo">
-      <div class="section">
-        <div class="section-title">PRAZO DE REPARO</div>
-        <div class="form-group">
-          <div>
-            <label>Cargo</label>
-            <input type="text" id="prazoreparocargo" value="Coordenador" readonly>
-          </div>
-          <div>
-            <label>Nome / Telefone</label>
-            <input type="text" id="prazoreparonometel" value="João Andrioli / 41 99244-9441" readonly>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>SLA do evento</label>
-            <input type="text" id="prazoreparosla" placeholder="Ex: 4h, 2h">
-          </div>
-          <div>
-            <label>Observações</label>
-            <input type="text" id="prazoreparoobs" placeholder="Observações">
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('prazo')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-cire">
-      <div class="section">
-        <div class="section-title">INTERVENÇÃO CIRE</div>
-        <div class="form-group">
-          <div>
-            <label>Solicitante</label>
-            <input type="text" id="cire_solicitante" placeholder="Nome do Solicitante">
-          </div>
-          <div>
-            <label>Meio de contato</label>
-            <div class="checkbox-group">
-              <label><input type="radio" name="cire_contato" value="Telefone"> Telefone</label>
-              <label><input type="radio" name="cire_contato" value="E-mail"> E-mail</label>
-              <label><input type="radio" name="cire_contato" value="WhatsApp"> WhatsApp</label>
-            </div>
-          </div>
-        </div>
-        <div class="form-group full">
-          <div>
-            <label>Motivo</label>
-            <textarea id="cire_motivo" placeholder="Descreva o motivo da intervenção CIRE"></textarea>
-          </div>
-        </div>
-        <div class="form-group full">
-          <div>
-            <label>Informação</label>
-            <textarea id="cire_info" placeholder="Informações adicionais"></textarea>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Previsão</label>
-            <input type="time" id="cire_previsao">
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('cire')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-escalonamento">
-      <div class="section">
-        <div class="section-title">ESCALONAMENTO SEM EQUIPE</div>
-        <div class="form-group">
-          <div>
-            <label>Cargo</label>
-            <input type="text" id="escalonamento_cargo" value="Coordenador" readonly>
-          </div>
-          <div>
-            <label>Nome / Telefone</label>
-            <input type="text" id="escalonamento_nome_tel" value="João Andrioli / 41 99244-9441" readonly>
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>SLA do evento</label>
-            <input type="text" id="escalonamento_sla" placeholder="Ex: 4h, 2h">
-          </div>
-          <div>
-            <label>Observações</label>
-            <input type="text" id="escalonamento_obs" placeholder="Observações">
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('escalonamento')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="dynamic-content" id="content-cto_defeito">
-      <div class="section">
-        <div class="section-title">CTO COM DEFEITO</div>
-        <div class="form-group">
-          <div>
-            <label>Nome SITE/ARO</label>
-            <input type="text" id="cto_defeito_site" list="siteList" placeholder="Digite para pesquisar ou selecione na lista">
-          </div>
-          <div>
-            <label>Splitter</label>
-            <input type="text" id="cto_defeito_splitter" placeholder="Ex: SP001, SP144">
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Caixa</label>
-            <input type="text" id="cto_defeito_caixa" placeholder="Ex: G0001, G0099, GP0050">
-          </div>
-          <div>
-            <label>Endereço</label>
-            <input type="text" id="cto_defeito_endereco" placeholder="Rua, Número, Complemento">
-          </div>
-        </div>
-        <div class="form-group">
-          <div>
-            <label>Causa</label>
-            <select id="cto_defeito_causa">
-              <option value="" disabled selected>Selecione</option>
-              <option value="Abalroamento">Abalroamento</option>
-              <option value="Furto">Furto</option>
-              <option value="Acidente">Acidente</option>
-              <option value="Descarga">Descarga</option>
-              <option value="Vandalismo">Vandalismo</option>
-              <option value="Troca de poste">Troca de poste</option>
-              <option value="Degradação / Infiltração">Degradação / Infiltração</option>
-              <option value="Defeito Splitter">Defeito Splitter</option>
-              <option value="Falha em atividade anterior">Falha em atividade anterior</option>
-              <option value="Obra de terceiros">Obra de terceiros</option>
-              <option value="Interperie">Interperie</option>
-              <option value="Ataque de animais">Ataque de animais</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group full">
-          <div>
-            <label>Tratativa realizada</label>
-            <textarea id="cto_defeito_tratativa" placeholder="Descreva a tratativa realizada"></textarea>
-          </div>
-        </div>
-        <div class="form-group full">
-          <div>
-            <label>Material utilizado</label>
-            <input type="text" id="cto_defeito_material" placeholder="Ex: Conector SC, Fibra óptica, Splitter">
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn-generate" onclick="generateStamp('cto_defeito')">Gerar Carimbo</button>
-          <button class="btn-clear" onclick="clearDynamic()">Limpar Formulário</button>
-        </div>
-      </div>
-    </div>
-
     <div id="output" class="output-section">
       <h3>Carimbo de Texto Gerado</h3>
       <div class="output-text" id="outputText"></div>
-      <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
-        <button class="btn-copy" onclick="copyToClipboard()">Copiar para Área de Transferência</button>
-        <button class="btn-copy" onclick="sendToWhatsApp()" style="background:#25d366;">Enviar via WhatsApp</button>
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
+        <button class="btn-copy" id="btnCopy" type="button">Copiar para Área de Transferência</button>
+        <button class="btn-copy" id="btnWhats" type="button" style="background:#25d366;">Enviar via WhatsApp</button>
       </div>
       <div class="success-message" id="successMessage">Texto copiado para a área de transferência!</div>
     </div>
   </div>
 
   <script>
-    const supervisorPhones = {
-      "alexandre ilha": "(51) 99753-4576",
-      "diego jaworski": "(51) 99670-7110",
-      "diego richter": "(51) 99754-9214",
-      "marcio mendes": "(51) 99589-2075",
-      "mario pereira": "(51) 99837-8234",
-      "rodrigo duarte": "(51) 99758-7793",
-      "rodrigo rosa": "(51) 99840-6074"
-    };
+const SCHEMA = {
+  app: { title: "Gerador de Carimbo - RS-CAPITAL", subtitle: "Sistema de Acionamento - GPON - Vivo Rede" },
+  lists: {
+    supervisors: [
+      { name: "Alexandre Ilha", phone: "(51) 99753-4576" },
+      { name: "Diego Jaworski", phone: "(51) 99670-7110" },
+      { name: "Diego Richter", phone: "(51) 99754-9214" },
+      { name: "Marcio Mendes", phone: "(51) 99589-2075" },
+      { name: "Mário Pereira", phone: "(51) 99837-8234" },
+      { name: "Rodrigo Duarte", phone: "(51) 99758-7793" },
+      { name: "Rodrigo Rosa", phone: "(51) 99840-6074" }
+    ],
 
-    function normalizeName(str) {
-      return (str || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .trim();
+    analysts: ["Carina F. Chuquel","Edmilson G. Rieira","Eduarda P. Rodrigues","Julia S. Silva","Matheus A. Castro","Rafaela V. Dias","Silvio L. R. Putrique"],
+
+
+// ✅ Diretório de técnicos (CONTATO / MATRÍCULA / COLABORADOR) — nomes abreviados
+techDirectory: [
+  { phone:"51 99763-8035", matricula:"00076213", name:"Matheus S. Sanguine" },
+  { phone:"51 99924-4755", matricula:"00163361", name:"Luciano Mabilia" },
+  { phone:"51 99678-8025", matricula:"00163721", name:"Ismael S. Brito" },
+  { phone:"51 99422-8248", matricula:"00060280", name:"Valdir R. C. Almeida" },
+  { phone:"51 98030-9631", matricula:"00073519", name:"Silvio L. R. Putrique" },
+  { phone:"51 99534-1867", matricula:"03540223", name:"José H. O. Machado" },
+  { phone:"51 98054-0410", matricula:"00163877", name:"Guilherme D. S. Freitas" },
+  { phone:"51 99526-0602", matricula:"00159101", name:"Lucas D. P. Cordeiro" },
+  { phone:"51 99709-0842", matricula:"00163697", name:"Robson R. Silva" },
+  { phone:"51 99618-2075", matricula:"00060276", name:"Laerte R. Silva" },
+  { phone:"51 99763-4557", matricula:"00075430", name:"Marcio A. G. S. Santos" },
+  { phone:"51 98064-4219", matricula:"00163623", name:"Luis C. S. Santos" },
+  { phone:"51 98658-5845", matricula:"00161608", name:"Ronaldo F. Dutra" },
+  { phone:"51 99612-4572", matricula:"03538188", name:"Marco A. Espindula" },
+  { phone:"51 98200-2880", matricula:"00161750", name:"Neivo J. Rosa" },
+  { phone:"51 99747-3044", matricula:"00163141", name:"Luis G. V. Ramos" },
+  { phone:"51 98457-3078", matricula:"00161587", name:"Carlos D. R. S. Silva" },
+  { phone:"51 98059-7226", matricula:"00163233", name:"Alex G. Matzenbacher" },
+  { phone:"51 98023-8657", matricula:"03552249", name:"Carlos A. Souza" },
+  { phone:"51 99570-4213", matricula:"03550117", name:"Cassiano R. A. S. Silva" },
+  { phone:"51 99919-9314", matricula:"00164406", name:"Jair S. Correia" },
+  { phone:"51 99764-5055", matricula:"00069814", name:"Sergio Klug" },
+  { phone:"51 98041-7960", matricula:"00163287", name:"Pablo J. Rosa" },
+  { phone:"51 98053-8983", matricula:"03538781", name:"Rafael B. Marco" },
+  { phone:"51 99871-5081", matricula:"03538393", name:"Nairo I. Mirandoli" },
+  { phone:"51 98098-6616", matricula:"00163683", name:"Diego M. Flores" },
+  { phone:"51 99150-5863", matricula:"00161589", name:"Alexandre M. F. S. Santos" },
+  { phone:"51 99597-6730", matricula:"00075370", name:"Atilas P. Carvalho" },
+  { phone:"51 99231-4424", matricula:"00176139", name:"Antonio C. V. Callegari" },
+  { phone:"51 99796-5508", matricula:"00176016", name:"João C. C. Marques" },
+  { phone:"51 99516-6051", matricula:"00176136", name:"Jonatan G. Santos" },
+  { phone:"51 99628-3036", matricula:"00176067", name:"Lindomar A. Nascimento" },
+  { phone:"51 98050-2082", matricula:"00176104", name:"Marcelo D. S. Teixeira" },
+  { phone:"51 99774-0215", matricula:"00176008", name:"Miguel A. F. S. M. Machado" },
+  { phone:"51 99859-9693", matricula:"00176073", name:"Uilian D. S. Salgado" },
+  { phone:"51 99897-8292", matricula:"00176115", name:"Vinicius D. S. Camponogara" }
+],
+
+
+    // Esta lista será preenchida automaticamente a partir do diretório
+    technicians: ["placeholder"],
+
+    sites: ["RSCBM_G1N01","RSCBM_O1A01","RSGUB_G1N01","RSNHO_G1I02","RSPAE_G1B95","RSPAE_G1C01","RSPAE_G1I22","RSPAE_G1I23","RSPAE_G1I24","RSPAE_G1I25","RSPAE_G1I26","RSPAE_G1I32","RSPAE_G1I33","RSPAE_G1I35","RSPAE_G1I41","RSPAE_G1I47","RSPAE_G1I48","RSPAE_G1I51","RSPAE_G1I55","RSPAE_G1I57","RSPAE_G1N42","RSPAE_G1N45","RSSLE_G1M01","RSSLE_O1A04"],
+    causes: ["Abalroamento","Furto","Acidente","Descarga","Vandalismo","Troca de poste","Degradação / Infiltração","Defeito Splitter","Falha em atividade anterior","Obra de terceiros","Interperie","Ataque de animais"],
+    materials: [
+      {id:"mat_0001",name:"ALÇA PREFORM P/ DROP ÓPT ASU ATÉ 12 FO",code:"0056-0003-0",unit:"un"},
+      {id:"mat_0002",name:"SPLITTER OPT. PASSIVO 1:8-10 DB-FTTH",code:"0192-0219-9",unit:"un"},
+      {id:"mat_0003",name:"KIT DERIV FIST-GCO DERIVAÇÃO RAYCHEM",code:"0219-0022-1",unit:"un"},
+      {id:"mat_0004",name:"ABRAÇ. AÇO INOX AUTO TRAVANTE S/PROT",code:"0219-0333-7",unit:"un"},
+      {id:"mat_0005",name:"LAÇO PRÉ-FORMADO LPF 4,8",code:"0256-0092-3",unit:"un"},
+      {id:"mat_0006",name:"DERIVAÇÃO T PRÉ-FORMADA P/CORDOALHA 6,4",code:"0256-0180-6",unit:"un"},
+      {id:"mat_0007",name:"LAÇO PREFORM P/ DROP ÓPT ASU ATÉ 12 FO",code:"0256-0234-9",unit:"un"},
+      {id:"mat_0008",name:"ALÇA PREF P/CFOA-SM-AS-80 de 18 a 36 fo",code:"0256-0243-5",unit:"un"},
+      {id:"mat_0009",name:"ALÇA PREF P/CFOA-SM-AS-80 de 48 a 72 fo",code:"0256-0244-6",unit:"un"},
+      {id:"mat_0010",name:"ALÇA PREF. P/ CORDOALHA DIELÉTRICA 6,4",code:"0380-9200-0",unit:"un"},
+      {id:"mat_0011",name:"CORDOALHA DIELÉTRICA 6,4",code:"0380-9201-1",unit:"m"},
+      {id:"mat_0012",name:"DERIVACAO PREF P CORD DIELETRICA 6,4",code:"0380-9202-2",unit:"un"},
+      {id:"mat_0013",name:"FIO DE ESPINAR DIELETRICO",code:"0380-9203-3",unit:"m"},
+      {id:"mat_0014",name:"LAÇO PREF. P/ CORDOALHA DIELÉTRICA 6,4",code:"0380-9204-4",unit:"un"},
+      {id:"mat_0015",name:"CABO OPTICO CFOA-SM AS 80 24F TS",code:"0452-0120-3",unit:"m"},
+      {id:"mat_0016",name:"KIT DERIV TERMOC CEO AEREO/SUBT FOSC100",code:"0460-0048-2",unit:"un"},
+      {id:"mat_0017",name:"CAIXA OPTICA 6 ADAPTADORES + PIGTAIL",code:"0486-0358-5",unit:"un"},
+      {id:"mat_0018",name:"CRUZETA P RESERVA TÉCNICA FO POSTE 300mm",code:"0254-0061-4",unit:"un"},
+      {id:"mat_0019",name:"SUP ANCORAGEM CABO OPT AS E CORD DIELETR",code:"0456-0157-7",unit:"un"},
+      {id:"mat_0020",name:"SUP PASSAGEM CABO OPT AS E CORD DIELETR",code:"0456-0158-8",unit:"un"},
+      {id:"mat_0021",name:"LAÇO PREF P/CFOA-SM-AS-80 DE 18 A 36 FO",code:"0456-0160-0",unit:"un"},
+      {id:"mat_0022",name:"LAÇO PREF P/CFOA-SM-AS-80 DE 48 A 72 FO",code:"0456-0161-1",unit:"un"},
+      {id:"mat_0023",name:"LAÇO PREF P/CFOA-SM-AS-80 DE 144 FO",code:"0456-0162-2",unit:"un"},
+      {id:"mat_0024",name:"CTOPS 70/30 (AZUL) OPT",code:"0380-9207-7",unit:"un"},
+      {id:"mat_0025",name:"CTOPS 80/20 (BRANCA) FC",code:"0380-9213-3",unit:"un"},
+      {id:"mat_0026",name:"CTOPS 90/10 (VERDE) FC",code:"0380-9215-5",unit:"un"},
+      {id:"mat_0027",name:"CTOPS 85/15 (AMARELA) FC",code:"0380-9214-4",unit:"un"},
+      {id:"mat_0028",name:"CTOPS 1:8 (ROXA) FC",code:"0256-0343-3",unit:"un"},
+      {id:"mat_0029",name:"CTOPS 60/40 (VERMELHA) FC",code:"0380-9211-1",unit:"un"},
+      {id:"mat_0030",name:"CTOPS 70/30 (AZUL) FC",code:"0380-9212-2",unit:"un"},
+      {id:"mat_0031",name:"MINI CDOE 1:8 ENTRADA E SAÍDA PRECON",code:"0186-0100-2",unit:"un"},
+      {id:"mat_0032",name:"MINI CDOE 85/15",code:"0186-0099-8",unit:"un"},
+      {id:"mat_0033",name:"MINI CDOE 80/20",code:"0186-0099-9",unit:"un"},
+      {id:"mat_0034",name:"MINI CDOE 90/10",code:"0186-0100-0",unit:"un"},
+      {id:"mat_0035",name:"MINI CDOE 60/40",code:"0186-0097-7",unit:"un"},
+      {id:"mat_0036",name:"MINI CDOE 70/30",code:"0186-0098-8",unit:"un"},
+      {id:"mat_0037",name:"BRAÇADEIRA REGULÁVEL POSTE BAP-3",code:"0256-0073-7",unit:"un"},
+      {id:"mat_0038",name:"ANEL DE DISTRIBUICAO EM ACO AGFS",code:"0230-0204-7",unit:"un"},
+      {id:"mat_0039",name:"BRAÇADEIRA REGULÁVEL POSTE BAP-2",code:"0256-0072-9",unit:"un"},
+      {id:"mat_0040",name:"ALÇA PLASTICA PARA ANCORAGEM CFOA 5MM",code:"0380-9220-0",unit:"un"},
+      {id:"mat_0041",name:"SUPORTE UNIVERSAL PARA CAIXA BARRAMENTO",code:"0460-0069-9",unit:"un"},
+      {id:"mat_0042",name:"PLAQUETA DE IDENTIFICAÇÃO PARA CABO ÓPTI",code:"0840-2667-7",unit:"un"},
+      {id:"mat_0043",name:"CARACTER ADESIVO 15MM ALGARISMOS 0-9",code:"9001-1358-8",unit:"plc"},
+      {id:"mat_0044",name:"CARACTER ADESIVO 15MM ALFABETO A-N",code:"9001-1360-0",unit:"plc"},
+      {id:"mat_0045",name:"CHAPA MEIO DE VAO",code:"0230-0232-5",unit:"un"},
+      {id:"mat_0046",name:"DROP OPTICO AS CM AR FIG8 LSZH - 4F",code:"0380-9221-1",unit:"m"},
+      {id:"mat_0047",name:"CABO DROP CIRCULAR 5 MM 12F",code:"0452-1257-7",unit:"m"},
+      {id:"mat_0048",name:"MINI-CEO TERMOC 16ENT AEREO E SUBT 144FO",code:"0456-0170-0",unit:"un"},
+      {id:"mat_0049",name:"CONJ EMENDA 48F 4ENT",code:"0456-0169-9",unit:"un"},
+      {id:"mat_0050",name:"CONJ EMENDA 72F 4ENT",code:"0456-0172-2",unit:"un"},
+      {id:"mat_0051",name:"CABO DROP CIRCULAR 12F - 100M",code:"0452-1258-8",unit:"un"},
+      {id:"mat_0052",name:"CABO DROP CIRCULAR 12F - 500M",code:"0452-1264-4",unit:"un"},
+      {id:"mat_0053",name:"CABO DROP CIRCULAR 12F - 150M",code:"0452-1259-9",unit:"un"},
+      {id:"mat_0054",name:"CABO DROP CIRCULAR 12F - 200M",code:"0452-1260-0",unit:"un"},
+      {id:"mat_0055",name:"CABO DROP CIRCULAR 12F - 250M",code:"0452-1261-1",unit:"un"},
+      {id:"mat_0056",name:"CABO DROP CIRCULAR 12F - 300M",code:"0452-1262-2",unit:"un"},
+      {id:"mat_0057",name:"CABO DROP CIRCULAR 12F - 400M",code:"0452-1263-3",unit:"un"},
+      {id:"mat_0058",name:"CABO DROP CIRCULAR 24F - 100M",code:"0452-1280-0",unit:"un"},
+      {id:"mat_0059",name:"ALÇA PLASTIC ATE 6,3MM C/GANCHO METALICO",code:"0380-9242-2",unit:"un"},
+      {id:"mat_0060",name:"CEOP 12F",code:"0456-0184-4",unit:"un"},
+      {id:"mat_0061",name:"CDPS 2 SP1:8 CAIXA DERIV PRE-C SPLIT",code:"0460-0072-2",unit:"un"},
+      {id:"mat_0062",name:"CDPS SP1:8 CAIXA DERIV PRE-C SPLIT",code:"0460-0074-4",unit:"un"},
+      {id:"mat_0063",name:"CDPS SP1:4 CAIXA DERIV PRE-C SPLIT",code:"0460-0080-0",unit:"un"},
+      {id:"mat_0064",name:"CDPS 4 SP1:4 CAIXA DERIV PRE-C SPLIT",code:"0460-0078-8",unit:"un"},
+      {id:"mat_0065",name:"CDPS 2 SP1:4 CAIXA DERIV PRE-C SPLIT",code:"0460-0079-9",unit:"un"},
+      {id:"mat_0066",name:"CONJ. SUP. CABOS OPT MEIO DE VAO RAQUETE",code:"0460-0084-4",unit:"un"},
+      {id:"mat_0067",name:"DROP 2PTAS FIG8 UNIV 100M PRET",code:"0380-9263-3",unit:"un"},
+      {id:"mat_0068",name:"DROP 2PTAS FIG8 UNIV 150M PRET",code:"0380-9264-4",unit:"un"},
+      {id:"mat_0069",name:"DROP 2PTAS FIG8 UNIV 200M PRET",code:"0380-9265-5",unit:"un"},
+      {id:"mat_0070",name:"DROP 2PTAS FIG8 UNIV 300M PRET",code:"0380-9266-6",unit:"un"},
+      {id:"mat_0071",name:"DROP 2PTAS FIG8 UNIV 400M PRET",code:"0380-9267-7",unit:"un"},
+      {id:"mat_0072",name:"FITA PARA ROTULADORA ELETRONICA (PT80)",code:"0378-1565-0",unit:"rolo"},
+      {id:"mat_0073",name:"ADAPTADOR REF UNIV DROP FIG8",code:"0380-9259-9",unit:"un"},
+      {id:"mat_0074",name:"FIO DE ESPINAR ISOLADO PARA AGRUPADOR",code:"0380-9291-0",unit:"m"},
+      {id:"mat_0075",name:"LAÇO PREF P/ CABO DROP ALT. CAP ATE 48",code:"0380-9294-0",unit:"un"},
+      {id:"mat_0076",name:"ALÇA PREF P/ CABO DROP ALT. CAP ATE 48",code:"0380-9295-0",unit:"un"},
+      {id:"mat_0077",name:"CUNHA PLÁST P/ DROP ÓPT ROC/FIG8 REDEXT",code:"0099-0119-0",unit:"un"},
+      {id:"mat_0078",name:"CONECT OPT FAC SC/APC FIG8 COMPAC REDEXT",code:"0380-9292-0",unit:"un"},
+      {id:"mat_0079",name:"DROP OPT COMP INTERNO CFOI REDEXT",code:"0380-9293-0",unit:"un"},
+      {id:"mat_0080",name:"PONTO TERMINAL DE REDE-ÓPTICO REDEXT",code:"0258-0397-0",unit:"un"},
+      {id:"mat_0081",name:"TUBO ISOLADOR MENSAGEIRO TIM 4,8MM",code:"0430-0018-0",unit:"m"},
+      {id:"mat_0082",name:"TUBO ISOLADOR MENSAGEIRO TIM 6,4MM",code:"0430-0019-0",unit:"m"},
+      {id:"mat_0083",name:"ALÇA PREF DROP FIG8",code:"0380-9296-0",unit:"un"},
+      {id:"mat_0084",name:"LAÇO PREF DROP FIG8",code:"0380-9297-0",unit:"un"},
+      {id:"mat_0085",name:"SUP ENCAIXE UNIFICADO 04 ROLD (TIPO DM)",code:"0456-0201-0",unit:"un"},
+      {id:"mat_0086",name:"SPIRAL TUBE 1/2 LARANJA",code:"0254-0082-7",unit:"m"},
+      {id:"mat_0087",name:"DUTO P PROTEÇÃO PARA CABOS EM REDE AEREA",code:"0430-0017-7",unit:"m"},
+      {id:"mat_0088",name:"CABO DROP ALTA CAPACID. 24F S/MPO",code:"0452-1331-0",unit:"m"},
+      {id:"mat_0089",name:"CABO DROP ALTA CAPACID. 36 FIBRAS S/MPO",code:"0452-1332-0",unit:"m"},
+      {id:"mat_0090",name:"CABO DROP ALTA CAPACID. 144 FIBRAS S/MPO",code:"0452-1373-0",unit:"m"},
+      {id:"mat_0091",name:"Protetor Ref p/ Conec Campo CDOE (NOVA)",code:"0458-0014-0",unit:"un"},
+      {id:"mat_0092",name:"CABO DROP ALTA CAPACID. 72 FIBRAS S/MPO",code:"0452-1333-0",unit:"m"},
+      {id:"mat_0093",name:"Protetor p/ Conec Reforçado de Campo",code:"0458-0015-0",unit:"un"},
+      {id:"mat_0094",name:"ALÇA PREF P/ CABO DROP ALT. CAP. 72FO",code:"0256-0367-0",unit:"un"},
+      {id:"mat_0095",name:"ALÇA PREF P/ CABO DROP ALT. CAP 144FO",code:"0256-0368-0",unit:"un"}
+    ]
+  },
+  baseFields: [
+    {id:"id_ocorrencia",label:"ID Ocorrência/OS CTO (BA/TT)",type:"text",placeholder:"Ex: 123456",group:"two"},
+    {id:"carimbo_tipo",label:"Selecione o Tipo de Carimbo",type:"select",optionsFrom:"types",group:"two"},
+    {id:"supervisor",label:"Supervisor",type:"datalist",listId:"supervisorList",listFrom:"supervisors",placeholder:"Nome do Supervisor",group:"two"},
+    {id:"supervisor_tel",label:"Telefone Supervisor",type:"tel",placeholder:"(51) 9XXXX-XXXX",inputmode:"tel",group:"two"},
+    {id:"tecnicos",label:"Técnicos(s)",type:"tags",listId:"tecnicoList",listFrom:"technicians",placeholder:"Comece a digitar para pesquisar",group:"two"},
+    {id:"tecnico_tel",label:"Telefone Técnico",type:"tel",placeholder:"(51) 9XXXX-XXXX",inputmode:"tel",group:"two"},
+    {id:"analista_ccr",label:"Analista CCR",type:"datalist",listId:"analistaList",listFrom:"analysts",placeholder:"Digite para pesquisar ou selecione na lista",group:"full"}
+  ],
+  types: [
+    {id:"acionamento",label:"1. Acionamento",title:"ACIONAMENTO",fields:[{id:"acionamento_prev_chegada",label:"Previsão de chegada ao SITE/ARO para medições",type:"time",group:"two"},{id:"acionamento_site",label:"Nome SITE/ARO para medições",type:"datalist",listId:"siteList",listFrom:"sites",placeholder:"Digite para pesquisar ou selecione na lista",group:"two"}],stamp:(d)=>["1 – ACIONAMENTO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Previsão de chegada ao SITE/ARO para medições: ${d.acionamento_prev_chegada}`,`Nome SITE/ARO para medições: ${d.acionamento_site}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"deslocamento",label:"2. Deslocamento ao Ponto da Falha",title:"DESLOCAMENTO AO PONTO DA FALHA",fields:[{id:"deslocamento_km",label:"KM até o LOCAL da falha",type:"number",step:"0.1",placeholder:"Ex: 15.5",group:"two"},{id:"deslocamento_prev_chegada",label:"Previsão de chegada ao LOCAL da falha",type:"time",group:"two"},{id:"deslocamento_obs",label:"Observações",type:"textarea",placeholder:"Observações sobre o deslocamento",group:"full"}],stamp:(d)=>["2 – DESLOCAMENTO AO PONTO DA FALHA","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`KM até o LOCAL da falha: ${d.deslocamento_km} km`,`Previsão de chegada ao LOCAL da falha: ${d.deslocamento_prev_chegada}`,`Obs.: ${d.deslocamento_obs}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"recuperacao",label:"3. Recuperação da Falha",title:"RECUPERAÇÃO DA FALHA",fields:[{id:"recuperacao_causa",label:"Causa raiz",type:"select",optionsFrom:"causes",group:"two"},{id:"recuperacao_prev_testes",label:"Previsão para solicitação de testes",type:"time",group:"two"},{id:"recuperacao_endereco",label:"Endereço da falha",type:"text",placeholder:"Rua, Número, Complemento",group:"two"},{id:"recuperacao_cabo",label:"Cabo / Capacidade / ARO",type:"select",options:["Drop Fig8 4F","12F","24F","36F","48F","72F","144F","288F"],group:"two"},{id:"recuperacao_tratativas",label:"Tratativas realizadas",type:"textarea",placeholder:"Descreva as tratativas",group:"full"},{id:"recuperacao_obs",label:"Observações",type:"textarea",placeholder:"Observações gerais",group:"full"}],stamp:(d)=>["3 – RECUPERAÇÃO DA FALHA","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Causa raiz: ${d.recuperacao_causa}`,`Previsão para solicitação de testes: ${d.recuperacao_prev_testes}`,`Endereço da falha: ${d.recuperacao_endereco}`,`Cabo/Capacidade/ARO: ${d.recuperacao_cabo}`,`Tratativas realizadas: ${d.recuperacao_tratativas}`,`Obs.: ${d.recuperacao_obs}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"certificacao",label:"4. Certificação",title:"SOLICITAÇÃO DE CERTIFICAÇÃO",fields:[{id:"certificacao_tratativa",label:"Tratativa realizada",type:"textarea",placeholder:"Descrição da tratativa realizada",group:"full"},{id:"certificacao_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},{id:"certificacao_material",label:"Materiais Utilizados",type:"materials",group:"full"},{id:"certificacao_foto",label:"Foto em anexo",type:"radio",name:"certificacao_foto",options:["Sim","Não"],group:"full"}],stamp:(d)=>{const materials=JSON.parse(d.certificacao_material||"[]");const materialText=materials.length>0?"Materiais utilizados:\n"+materials.map(m=>`  - ${m.name}: ${m.quantity} ${m.unit} (${m.code})`).join("\n")+"\n":"Nenhum material registrado";return["4 – SOLICITAÇÃO DE CERTIFICAÇÃO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Tratativa realizada: ${d.certificacao_tratativa}`,`Causa: ${d.certificacao_causa}`,materialText,`Foto em anexo: ${d.certificacao_foto}`,`Analista CCR: ${d.analista_ccr}`]}} ,
+    {id:"complementar",label:"Complementar",title:"COMPLEMENTAR",fields:[{id:"complementar_motivo",label:"Motivo",type:"text",placeholder:"Motivo da complementação",group:"two"},{id:"complementar_info",label:"Informação",type:"text",placeholder:"Informação adicional",group:"two"},{id:"nova_previsao",label:"Nova previsão?",type:"radio",name:"nova_previsao",options:["Sim","Não"],group:"two"},{id:"complementar_previsao",label:"Previsão",type:"time",group:"two"}],stamp:(d)=>["COMPLEMENTAR","",`ID Ocorrência: ${d.id_ocorrencia}`,`Motivo: ${d.complementar_motivo}`,`Informação: ${d.complementar_info}`,`Nova previsão? ${d.nova_previsao}`,`Previsão: ${d.complementar_previsao}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"naofalha",label:"Não há Falha para Rede",title:"NÃO HÁ FALHA PARA REDE",fields:[{id:"naofalha_motivo",label:"Motivo da Improdutiva",type:"textarea",placeholder:"Descreva o motivo da improdutiva",group:"full"},{id:"naofalha_foto",label:"Foto em anexo",type:"radio",name:"naofalha_foto",options:["Sim","Não"],group:"two"},{id:"naofalha_gestor",label:"Ciente (Gestor VIVO Rede)",type:"text",value:"João Andrioli",readonly:true,group:"two"}],stamp:(d)=>["NÃO HÁ FALHA PARA REDE","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Motivo da improdutiva: ${d.naofalha_motivo}`,`Foto em anexo: ${d.naofalha_foto}`,`Ciente (Gestor VIVO Rede): ${d.naofalha_gestor}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"transbordo",label:"Transbordo",title:"TRANSBORDO",fields:[{id:"transbordota",label:"TA",type:"text",placeholder:"TA",group:"two"},{id:"transbordocontrato",label:"CONTRATO",type:"text",placeholder:"Contrato",group:"two"},{id:"transbordooperadora",label:"TRANSBORDO",type:"text",value:"VIVO",readonly:true,group:"two"}],stamp:(d)=>["TRANSBORDO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`TA: ${d.transbordota}`,`CONTRATO: ${d.transbordocontrato}`,`TRANSBORDO: ${d.transbordooperadora}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"prazo",label:"Prazo de Reparo",title:"PRAZO DE REPARO",fields:[{id:"prazoreparocargo",label:"Cargo",type:"text",value:"Coordenador",readonly:true,group:"two"},{id:"prazoreparonometel",label:"Nome / Telefone",type:"text",value:"João Andrioli / 41 99244-9441",readonly:true,group:"two"},{id:"prazoreparosla",label:"SLA do evento",type:"text",placeholder:"Ex: 4h, 2h",group:"two"},{id:"prazoreparoobs",label:"Observações",type:"text",placeholder:"Observações",group:"two"}],stamp:(d)=>["ESCALONAMENTO PRAZO REPARO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Cargo: ${d.prazoreparocargo}`,`Nome/Tel.: ${d.prazoreparonometel}`,`SLA do evento: ${d.prazoreparosla}`,`Obs.: ${d.prazoreparoobs}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"cire",label:"CIRE",title:"INTERVENÇÃO CIRE",fields:[{id:"cire_solicitante",label:"Solicitante",type:"text",placeholder:"Nome do Solicitante",group:"two"},{id:"cire_contato",label:"Meio de contato",type:"radio",name:"cire_contato",options:["Telefone","E-mail","WhatsApp"],group:"two"},{id:"cire_motivo",label:"Motivo",type:"textarea",placeholder:"Descreva o motivo da intervenção CIRE",group:"full"},{id:"cire_info",label:"Informação",type:"textarea",placeholder:"Informações adicionais",group:"full"},{id:"cire_previsao",label:"Previsão",type:"time",group:"two"}],stamp:(d)=>["INTERVENÇÃO CIRE","",`ID Ocorrência: ${d.id_ocorrencia}`,`Solicitante: ${d.cire_solicitante}`,`Meio de contato: ${d.cire_contato}`,`Motivo: ${d.cire_motivo}`,`Informação: ${d.cire_info}`,`Previsão: ${d.cire_previsao}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"escalonamento",label:"Escalonamento sem Equipe",title:"ESCALONAMENTO SEM EQUIPE",fields:[{id:"escalonamento_cargo",label:"Cargo",type:"text",value:"Coordenador",readonly:true,group:"two"},{id:"escalonamento_nome_tel",label:"Nome / Telefone",type:"text",value:"João Andrioli / 41 99244-9441",readonly:true,group:"two"},{id:"escalonamento_sla",label:"SLA do evento",type:"text",placeholder:"Ex: 4h, 2h",group:"two"},{id:"escalonamento_obs",label:"Observações",type:"text",placeholder:"Observações",group:"two"}],stamp:(d)=>["ESCALONAMENTO SEM EQUIPE","",`ID Ocorrência: ${d.id_ocorrencia}`,`Cargo: ${d.escalonamento_cargo}`,`Nome/Tel.: ${d.escalonamento_nome_tel}`,`SLA do evento: ${d.escalonamento_sla}`,`Obs.: ${d.escalonamento_obs}`,`Analista CCR: ${d.analista_ccr}`]},
+    {id:"cto_defeito",label:"CTO com Defeito",title:"CTO COM DEFEITO",fields:[{id:"cto_defeito_site",label:"Nome SITE/ARO",type:"datalist",listId:"siteList",listFrom:"sites",placeholder:"Digite para pesquisar ou selecione na lista",group:"two"},{id:"cto_defeito_splitter",label:"Splitter",type:"text",placeholder:"Ex: SP001, SP144",group:"two"},{id:"cto_defeito_caixa",label:"Caixa",type:"text",placeholder:"Ex: G0001, G0099, GP0050",group:"two"},{id:"cto_defeito_endereco",label:"Endereço",type:"text",placeholder:"Rua, Número, Complemento",group:"two"},{id:"cto_defeito_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},{id:"cto_defeito_tratativa",label:"Tratativa realizada",type:"textarea",placeholder:"Descreva a tratativa realizada",group:"full"},{id:"cto_defeito_material",label:"Materiais Utilizados",type:"materials",group:"full"}],stamp:(d)=>{const materials=JSON.parse(d.cto_defeito_material||"[]");const materialText=materials.length>0?"Materiais utilizados:\n"+materials.map(m=>`  - ${m.name}: ${m.quantity} ${m.unit} (${m.code})`).join("\n")+"\n":"Nenhum material registrado";return["CTO COM DEFEITO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Nome SITE/ARO: ${d.cto_defeito_site}`,`Splitter: ${d.cto_defeito_splitter}`,`Caixa: ${d.cto_defeito_caixa}`,`Endereço: ${d.cto_defeito_endereco}`,`Causa: ${d.cto_defeito_causa}`,`Tratativa realizada: ${d.cto_defeito_tratativa}`,materialText,`Analista CCR: ${d.analista_ccr}`]}}
+  ]
+};
+
+// ✅ Ordenação alfabética (ignorando acentos)
+const sortPT = (a, b) => (a || "").localeCompare(b || "", "pt-BR", { sensitivity: "base" });
+
+// ✅ Se existir diretório, usa ele como fonte principal para o datalist
+if (Array.isArray(SCHEMA.lists.techDirectory) && SCHEMA.lists.techDirectory.length) {
+  SCHEMA.lists.techDirectory = SCHEMA.lists.techDirectory.map(x => ({
+    name: (x.name || "").trim(),
+    phone: (x.phone || "").trim(),
+    matricula: (x.matricula || "").trim()
+  }));
+  SCHEMA.lists.technicians = [...new Set(SCHEMA.lists.techDirectory.map(x => x.name))].sort(sortPT);
+}
+
+const $ = (id) => document.getElementById(id);
+const normalizeName = (str) => (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+const supervisorPhones = Object.fromEntries(SCHEMA.lists.supervisors.map(s => [normalizeName(s.name), s.phone]));
+
+// ✅ índices rápidos do diretório
+const techByName = new Map((SCHEMA.lists.techDirectory || []).map(t => [normalizeName(t.name), t]));
+const techByMat  = new Map((SCHEMA.lists.techDirectory || []).map(t => [String(t.matricula || "").trim(), t]));
+
+function formatPhoneBR(raw) {
+  const digits = String(raw || "").replace(/\D/g, "");
+  if (digits.length === 11) return `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7)}`;
+  if (digits.length === 10) return `(${digits.slice(0,2)}) ${digits.slice(2,6)}-${digits.slice(6)}`;
+  return raw || "";
+}
+
+function findTechRecord(key) {
+  const k = String(key || "").trim();
+  if (!k) return null;
+
+  const byName = techByName.get(normalizeName(k));
+  if (byName) return byName;
+
+  const byMat = techByMat.get(k);
+  if (byMat) return byMat;
+
+  const d = k.replace(/\D/g, "");
+  if (d.length >= 10) {
+    const rec = (SCHEMA.lists.techDirectory || []).find(t => (t.phone || "").replace(/\D/g, "") === d);
+    if (rec) return rec;
+  }
+
+  return null;
+}
+
+// ✅ Escape HTML correto (evita XSS e evita duplicar &)
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function linesToSafeHtml(lines) {
+  return (lines || [])
+    .map(line => escapeHtml(line).replace(/\n/g, "&lt;br&gt;"))
+    .join("&lt;br&gt;\n")
+    .trim();
+}
+
+function buildDatalist(id, values) {
+  let dl = $(id);
+  if (!dl) { dl = document.createElement("datalist"); dl.id = id; document.body.appendChild(dl); }
+  dl.innerHTML = (values || []).map(v => `<option value="${escapeHtml(v)}"></option>`).join("");
+}
+
+function groupClass(group) { return group === "full" ? "form-group full" : group === "three" ? "form-group three-col" : "form-group"; }
+
+function renderField(field) {
+  const { id, label, type, placeholder, value, readonly, inputmode, step, listId, listFrom, options, optionsFrom, name } = field;
+  const safeLabel = escapeHtml(label || ""), safeId = escapeHtml(id || ""), ro = readonly ? "readonly" : "", im = inputmode ? `inputmode="${escapeHtml(inputmode)}"` : "", st = step ? `step="${escapeHtml(step)}"` : "", ph = placeholder ? `placeholder="${escapeHtml(placeholder)}"` : "", val = (value !== undefined && value !== null) ? `value="${escapeHtml(value)}"` : "";
+
+  if (type === "textarea") return `<div><label for="${safeId}">${safeLabel}</label><textarea id="${safeId}" ${ph} ${ro}>${escapeHtml(value ?? "")}</textarea></div>`;
+  if (type === "select") {
+    const opts = optionsFrom ? (optionsFrom === "types" ? SCHEMA.types.map(t => ({ value: t.id, text: t.label })) : (SCHEMA.lists[optionsFrom] || []).map(v => ({ value: v, text: v }))) : (options || []).map(v => ({ value: v, text: v }));
+    const first = (id === "carimbo_tipo") ? `<option value="">-- Selecione --</option>` : `<option value="" disabled selected>Selecione</option>`;
+    return `<div><label for="${safeId}">${safeLabel}</label><select id="${safeId}">${first}${opts.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.text)}</option>`).join("")}</select></div>`;
+  }
+  if (type === "radio") {
+    const radioName = name || id, opts = (options || []);
+    return `<div><label>${safeLabel}</label><div class="checkbox-group">${opts.map(opt => {const v = escapeHtml(opt); return `<label><input type="radio" name="${escapeHtml(radioName)}" value="${v}"> ${v}</label>`}).join("")}</div></div>`;
+  }
+  if (type === "datalist") {
+    const values = (listFrom === "supervisors") ? SCHEMA.lists.supervisors.map(s => s.name) : (SCHEMA.lists[listFrom] || []);
+    buildDatalist(listId, values);
+    return `<div><label for="${safeId}">${safeLabel}</label><input type="text" id="${safeId}" list="${escapeHtml(listId)}" ${ph} ${val} ${ro} /></div>`;
+  }
+
+  // ✅ TAGS: substituído por tabela (CONTATO/MATRÍCULA/COLABORADOR)
+  if (type === "tags") {
+    const values = (SCHEMA.lists[listFrom] || []);
+    buildDatalist(listId, values);
+    return `
+      <div>
+        <label for="${safeId}_input">${safeLabel}</label>
+        <div class="tags-wrap" id="${safeId}_wrap">
+          <div class="tech-table" id="${safeId}_table"></div>
+          <div class="tags-row">
+            <input type="text" id="${safeId}_input" list="${escapeHtml(listId)}" ${ph} />
+            <button type="button" id="${safeId}_add" class="btn-copy btn-add">Adicionar</button>
+          </div>
+        </div>
+        <input type="hidden" id="${safeId}" value="" />
+      </div>
+    `;
+  }
+
+  if (type === "materials") {
+    const materialsData = [...(SCHEMA.lists.materials || [])].sort((a, b) =>
+      (a.name || "").localeCompare(b.name || "", "pt-BR", { sensitivity: "base" })
+    );
+
+    const listId2 = `${id}_datalist`;
+
+    return `<div>
+      <label>${safeLabel}</label>
+      <div class="materials-wrap" id="${safeId}_wrap">
+        <div class="materials-list" id="${safeId}_list">
+          <p class="materials-empty">Nenhum material adicionado</p>
+        </div>
+
+        <div class="materials-add">
+          <input type="text" id="${safeId}_search" list="${listId2}"
+            placeholder="Digite para buscar material..." 
+            style="flex:1;min-width:200px;padding:8px;border:1px solid var(--border-2);border-radius:4px;font-size:12px">
+
+          <datalist id="${listId2}">
+            ${materialsData.map(m => `<option value="${escapeHtml(m.name)}"></option>`).join("")}
+          </datalist>
+
+          <input type="number" id="${safeId}_qty" placeholder="Qtd" min="0.1" step="0.1">
+          <button type="button" id="${safeId}_add_btn" class="btn-copy btn-add">Adicionar</button>
+        </div>
+      </div>
+      <input type="hidden" id="${safeId}" value="[]" />
+    </div>`;
+  }
+
+  const inputType = escapeHtml(type || "text");
+  return `<div><label for="${safeId}">${safeLabel}</label><input type="${inputType}" id="${safeId}" ${ph} ${val} ${ro} ${im} ${st} /></div>`;
+}
+
+function renderForm(fields) {
+  const rows = []; let buffer = []; let currentGroup = null;
+  function flush(group) { if (!buffer.length) return; rows.push(`<div class="${groupClass(group)}">${buffer.join("")}</div>`); buffer = []; }
+  for (const f of fields) {
+    const g = f.group || "two";
+    if (currentGroup === null) currentGroup = g;
+    if (g !== currentGroup) { flush(currentGroup); currentGroup = g; }
+    buffer.push(renderField(f));
+  }
+  flush(currentGroup);
+  return rows.join("");
+}
+
+function getCheckedValue(name) { return document.querySelector(`input[name="${CSS.escape(name)}"]:checked`)?.value || ""; }
+
+function getValueById(id) {
+  const el = $(id);
+  if (!el) return "";
+  if (el.tagName === "SELECT") return el.value || "";
+  return (el.value ?? "").toString();
+}
+
+function collectData(typeDef) {
+  const data = {};
+  for (const f of SCHEMA.baseFields) {
+    if (f.type === "radio") data[f.id] = getCheckedValue(f.name || f.id);
+    else data[f.id] = (getValueById(f.id).trim?.() ?? getValueById(f.id));
+  }
+  for (const f of (typeDef?.fields || [])) {
+    if (f.type === "radio") data[f.id] = getCheckedValue(f.name || f.id);
+    else data[f.id] = (getValueById(f.id).trim?.() ?? getValueById(f.id));
+  }
+  return data;
+}
+
+function hideOutput() { $("output").classList.remove("active"); $("outputText").innerHTML = ""; $("successMessage").classList.remove("show"); }
+
+function showOutput(html) { $("outputText").innerHTML = html; $("output").classList.add("active"); $("output").scrollIntoView({ behavior: "smooth" }); }
+
+function clearTypeFields(typeDef) {
+  if (!typeDef) return;
+  for (const f of typeDef.fields) {
+    if (!!f.readonly) continue;
+    if (f.type === "radio") { const nm = f.name || f.id; document.querySelectorAll(`input[name="${CSS.escape(nm)}"]`).forEach(r => r.checked = false); continue; }
+    const el = $(f.id);
+    if (!el) continue;
+    if (f.type === "materials") { el.value = "[]"; el.__clearMaterials && el.__clearMaterials(); continue; }
+    if (f.type === "tags") { el.value = ""; el.__clearTags && el.__clearTags(); continue; }
+    if (el.tagName === "SELECT") el.selectedIndex = 0; else el.value = "";
+  }
+  hideOutput();
+}
+
+function renderDynamic(typeId) {
+  const root = $("dynamicRoot");
+  root.innerHTML = "";
+  if (!typeId) { root.innerHTML = `<div class="section"><div class="hint">Selecione um tipo de carimbo acima para ver os campos específicos.</div></div>`; hideOutput(); return; }
+  const typeDef = SCHEMA.types.find(t => t.id === typeId);
+  if (!typeDef) return;
+  root.innerHTML = `<div class="section"><div class="section-title">${escapeHtml(typeDef.title)}</div>${renderForm(typeDef.fields)}<div class="actions"><button class="btn-generate" id="btnGenerate" type="button">Gerar Carimbo</button><button class="btn-clear" id="btnClear" type="button">Limpar Formulário</button></div></div>`;
+  $("btnGenerate").addEventListener("click", () => { const data = collectData(typeDef); const html = linesToSafeHtml(typeDef.stamp(data)); showOutput(html); });
+  $("btnClear").addEventListener("click", () => clearTypeFields(typeDef));
+  setTimeout(() => { for (const f of typeDef.fields) { if (f.type === "materials") initMaterialsField(f.id); } }, 0);
+}
+
+// ✅ Campo técnicos em tabela (sem chips)
+function initTechsTableField(fieldId, { delimiter = " / " } = {}) {
+  const input = document.getElementById(`${fieldId}_input`);
+  const addBtn = document.getElementById(`${fieldId}_add`);
+  const tableWrap = document.getElementById(`${fieldId}_table`);
+  const hidden = document.getElementById(fieldId);
+
+  if (!input || !addBtn || !tableWrap || !hidden) return;
+
+  const state = { items: [] }; // {name, phone, matricula}
+
+  const syncHidden = () => {
+    hidden.value = state.items.map(x => x.name).join(delimiter);
+  };
+
+  const syncFirstPhone = () => {
+    const telInput = document.getElementById("tecnico_tel");
+    if (!telInput) return;
+    const first = state.items[0];
+    telInput.value = first ? formatPhoneBR(first.phone) : "";
+  };
+
+  const render = () => {
+    tableWrap.innerHTML = "";
+
+    if (state.items.length === 0) {
+      tableWrap.innerHTML = `<div class="muted">Nenhum técnico adicionado</div>`;
+      return;
     }
 
-    document.getElementById("carimbo_tipo").addEventListener("change", function() {
-      const tipo = this.value;
-      document.querySelectorAll(".dynamic-content").forEach(el => {
-        el.classList.remove("active");
-      });
-      if (tipo) {
-        const contentId = "content-" + tipo;
-        const content = document.getElementById(contentId);
-        if (content) content.classList.add("active");
-      } else {
-        document.getElementById("content-default").classList.add("active");
-      }
-      document.getElementById("output").classList.remove("active");
+    const table = document.createElement("table");
+    const header = table.insertRow();
+    ["CONTATO", "MATRÍCULA", "COLABORADOR", ""].forEach(t => {
+      const th = document.createElement("th");
+      th.textContent = t;
+      header.appendChild(th);
     });
 
-    document.getElementById("supervisor").addEventListener("input", function() {
-      const nome = this.value;
-      const tel = supervisorPhones[normalizeName(nome)];
-      if (tel) document.getElementById("supervisor_tel").value = tel;
+    state.items.forEach((it, idx) => {
+      const row = table.insertRow();
+      row.insertCell().textContent = formatPhoneBR(it.phone || "");
+      row.insertCell().textContent = it.matricula || "";
+      row.insertCell().textContent = it.name || "";
+
+      const actions = row.insertCell();
+      actions.style.textAlign = "center";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-x";
+      btn.textContent = "✕";
+      btn.title = "Remover";
+      btn.addEventListener("click", () => {
+        state.items.splice(idx, 1);
+        syncHidden();
+        syncFirstPhone();
+        render();
+      });
+      actions.appendChild(btn);
     });
 
-    function clearDynamic() {
-      const tipo = document.getElementById("carimbo_tipo").value;
-      if (!tipo) return;
-      const contentId = "content-" + tipo;
-      const content = document.getElementById(contentId);
-      const inputs = content.querySelectorAll("input[type='text'], input[type='tel'], input[type='number'], input[type='time'], textarea, select");
-      inputs.forEach(input => {
-        if (input.readOnly) return;
-        if (input.type === "radio" || input.type === "checkbox") {
-          input.checked = false;
-        } else {
-          input.value = "";
-        }
+    tableWrap.appendChild(table);
+  };
+
+  const addValue = () => {
+    const raw = (input.value || "").trim();
+    if (!raw) return;
+
+    const rec = findTechRecord(raw);
+    if (!rec) {
+      alert("Colaborador não encontrado. Selecione da lista ou informe matrícula/telefone válido.");
+      return;
+    }
+
+    const key = (rec.matricula || normalizeName(rec.name));
+    const exists = state.items.some(x => (x.matricula || normalizeName(x.name)) === key);
+    if (exists) { input.value = ""; return; }
+
+    state.items.push({ name: rec.name, phone: rec.phone, matricula: rec.matricula });
+
+    input.value = "";
+    syncHidden();
+    syncFirstPhone();
+    render();
+    input.focus();
+  };
+
+  addBtn.addEventListener("click", addValue);
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addValue();
+    }
+    if (e.key === "Backspace" && !input.value && state.items.length) {
+      state.items.pop();
+      syncHidden();
+      syncFirstPhone();
+      render();
+    }
+  });
+
+  // compatível com limpar formulário
+  hidden.__clearTags = () => {
+    state.items = [];
+    syncHidden();
+    syncFirstPhone();
+    render();
+  };
+
+  syncHidden();
+  syncFirstPhone();
+  render();
+}
+
+function initMaterialsField(fieldId) {
+  const searchInput = document.getElementById(`${fieldId}_search`);
+  const qty = document.getElementById(`${fieldId}_qty`);
+  const addBtn = document.getElementById(`${fieldId}_add_btn`);
+  const list = document.getElementById(`${fieldId}_list`);
+  const hidden = document.getElementById(fieldId);
+
+  if (!searchInput || !qty || !addBtn || !list || !hidden) return;
+
+  const state = { items: [] };
+
+  const syncHidden = () => { hidden.value = JSON.stringify(state.items); };
+
+  const render = () => {
+    list.innerHTML = "";
+
+    if (state.items.length === 0) {
+      list.innerHTML = `<p class="materials-empty">Nenhum material adicionado</p>`;
+      return;
+    }
+
+    const table = document.createElement("table");
+
+    const header = table.insertRow();
+    ["Material", "Qtd", "Un", ""].forEach(text => {
+      const th = document.createElement("th");
+      th.textContent = text;
+      header.appendChild(th);
+    });
+
+    state.items.forEach((item, idx) => {
+      const row = table.insertRow();
+
+      const c1 = row.insertCell(); c1.textContent = item.name;
+      const c2 = row.insertCell(); c2.textContent = item.quantity;
+      const c3 = row.insertCell(); c3.textContent = item.unit;
+
+      const c4 = row.insertCell();
+      c4.style.textAlign = "center";
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "✕";
+      btn.style.background = "transparent";
+      btn.style.border = "none";
+      btn.style.cursor = "pointer";
+      btn.style.color = "var(--accent)";
+      btn.style.fontWeight = "700";
+
+      btn.addEventListener("click", () => {
+        state.items.splice(idx, 1);
+        syncHidden();
+        render();
       });
+
+      c4.appendChild(btn);
+    });
+
+    list.appendChild(table);
+  };
+
+  const addMaterial = () => {
+    const materialKey = searchInput.value.trim();
+    const quantity = parseFloat(qty.value);
+
+    if (!materialKey || !quantity || quantity <= 0) {
+      alert("Digite um material e informe a quantidade válida");
+      return;
     }
 
-    function generateStamp(tipo) {
-      const idOcorrencia = document.getElementById("id_ocorrencia").value;
-      const supervisor = document.getElementById("supervisor").value;
-      const supervisorTel = document.getElementById("supervisor_tel").value;
-      const tecnico = document.getElementById("tecnico").value;
-      const tecnicoTel = document.getElementById("tecnico_tel").value;
-      const analistaCCR = document.getElementById("analista_ccr").value;
-      let stamp = "";
+    const materialData =
+      SCHEMA.lists.materials.find(m => m.name === materialKey) ||
+      SCHEMA.lists.materials.find(m => m.code === materialKey);
 
-      if (tipo === "acionamento") {
-        const prevChegada = document.getElementById("acionamento_prev_chegada").value;
-        const site = document.getElementById("acionamento_site").value;
-        stamp = `1 - ACIONAMENTO <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-Previsão de chegada ao SITE/ARO para medições: ${prevChegada} <br>\nNome SITE/ARO para medições: ${site} <br>
-Analista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "deslocamento") {
-        const km = document.getElementById("deslocamento_km").value;
-        const prevChegada = document.getElementById("deslocamento_prev_chegada").value;
-        const obs = document.getElementById("deslocamento_obs").value;
-        stamp = `2 - DESLOCAMENTO AO PONTO DA FALHA <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-KM até o LOCAL da falha: ${km} km <br>\nPrevisão de chegada ao LOCAL da falha: ${prevChegada} <br>
-Obs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "recuperacao") {
-        const causa = document.getElementById("recuperacao_causa").value;
-        const prevTestes = document.getElementById("recuperacao_prev_testes").value;
-        const endereco = document.getElementById("recuperacao_endereco").value;
-        const cabo = document.getElementById("recuperacao_cabo").value;
-        const tratativas = document.getElementById("recuperacao_tratativas").value;
-        const obs = document.getElementById("recuperacao_obs").value;
-        stamp = `3 - RECUPERAÇÃO DA FALHA <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-Causa raiz: ${causa} <br>\nPrevisão para solicitação de testes: ${prevTestes} <br>\nEndereço da falha: ${endereco} <br>\nCabo/Capacidade/ARO: ${cabo} <br>
-Tratativas realizadas: ${tratativas} <br>
-Obs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "certificacao") {
-        const tratativa = document.getElementById("certificacao_tratativa").value;
-        const causa = document.getElementById("certificacao_causa").value;
-        const material = document.getElementById("certificacao_material").value;
-        const foto = document.querySelector("input[name='certificacao_foto']:checked")?.value || "";
-        stamp = `4 - SOLICITAÇÃO DE CERTIFICAÇÃO <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-Tratativa realizada: ${tratativa} <br>\nCausa: ${causa} <br>\nMaterial utilizado: ${material} <br>\nFoto em anexo: ${foto} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "complementar") {
-        const motivo = document.getElementById("complementar_motivo").value;
-        const info = document.getElementById("complementar_info").value;
-        const novaPrevisao = document.querySelector("input[name='nova_previsao']:checked")?.value || "";
-        const previsao = document.getElementById("complementar_previsao").value;
-        stamp = `COMPLEMENTAR <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-Motivo: ${motivo} <br>\nInformação: ${info} <br>\nNova previsão? ${novaPrevisao} <br>\nPrevisão: ${previsao} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "naofalha") {
-        const motivo = document.getElementById("naofalha_motivo").value;
-        const foto = document.querySelector("input[name='naofalha_foto']:checked")?.value || "";
-        const gestor = document.getElementById("naofalha_gestor").value;
-        stamp = `NÃO HÁ FALHA PARA REDE <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-Motivo da improdutiva: ${motivo} <br>\nFoto em anexo: ${foto} <br>\nCiente (Gestor VIVO Rede): ${gestor} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "transbordo") {
-        const ta = document.getElementById("transbordota").value;
-        const contrato = document.getElementById("transbordocontrato").value;
-        const transbordo = document.getElementById("transbordooperadora").value;
-        stamp = `TRANSBORDO <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-TA: ${ta} <br>\nCONTRATO: ${contrato} <br>\nTRANSBORDO: ${transbordo} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "prazo") {
-        const cargo = document.getElementById("prazoreparocargo").value;
-        const nomeTel = document.getElementById("prazoreparonometel").value;
-        const sla = document.getElementById("prazoreparosla").value;
-        const obs = document.getElementById("prazoreparoobs").value;
-        stamp = `ESCALONAMENTO PRAZO REPARO <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-Cargo: ${cargo} <br>\nNome/Tel.: ${nomeTel} <br>\nSLA do evento: ${sla} <br>\nObs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "cire") {
-        const solicitante = document.getElementById("cire_solicitante").value;
-        const contato = document.querySelector("input[name='cire_contato']:checked")?.value || "";
-        const motivo = document.getElementById("cire_motivo").value;
-        const info = document.getElementById("cire_info").value;
-        const previsao = document.getElementById("cire_previsao").value;
-        stamp = `INTERVENÇÃO CIRE <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-Solicitante: ${solicitante} <br>\nMeio de contato: ${contato} <br>\nMotivo: ${motivo} <br>\nInformação: ${info} <br>\nPrevisão: ${previsao} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "escalonamento") {
-        const cargo = document.getElementById("escalonamento_cargo").value;
-        const nomeTel = document.getElementById("escalonamento_nome_tel").value;
-        const sla = document.getElementById("escalonamento_sla").value;
-        const obs = document.getElementById("escalonamento_obs").value;
-        stamp = `ESCALONAMENTO SEM EQUIPE <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-Cargo: ${cargo} <br>\nNome/Tel.: ${nomeTel} <br>\nSLA do evento: ${sla} <br>\nObs.: ${obs} <br>\nAnalista CCR: ${analistaCCR}`.trim();
-      } else if (tipo === "cto_defeito") {
-        const site = document.getElementById("cto_defeito_site").value;
-        const splitter = document.getElementById("cto_defeito_splitter").value;
-        const caixa = document.getElementById("cto_defeito_caixa").value;
-        const endereco = document.getElementById("cto_defeito_endereco").value;
-        const causa = document.getElementById("cto_defeito_causa").value;
-        const tratativa = document.getElementById("cto_defeito_tratativa").value;
-        const material = document.getElementById("cto_defeito_material").value;
-        stamp = `CTO COM DEFEITO <br>
- <br>
-ID Ocorrência: ${idOcorrencia} <br>
-SUPERVISOR: ${supervisor} <br>\nTelefone: ${supervisorTel} <br>
-TÉCNICO: ${tecnico} <br>\nTelefone: ${tecnicoTel} <br>
-Nome SITE/ARO: ${site} <br>\nSplitter: ${splitter} <br>\nCaixa: ${caixa} <br>\nEndereço: ${endereco} <br>\nCausa: ${causa} <br>
-Tratativa realizada: ${tratativa} <br>\nMaterial utilizado: ${material} <br>
-Analista CCR: ${analistaCCR}`.trim();
-      }
-
-      document.getElementById("outputText").textContent = stamp;
-      document.getElementById("output").classList.add("active");
-      document.getElementById("output").scrollIntoView({ behavior: "smooth" });
+    if (!materialData) {
+      alert("Material não encontrado. Selecione da lista.");
+      return;
     }
 
-    function copyToClipboard() {
-      const outputText = document.getElementById("outputText").textContent;
-      navigator.clipboard.writeText(outputText).then(() => {
-        const msg = document.getElementById("successMessage");
-        msg.classList.add("show");
-        setTimeout(() => msg.classList.remove("show"), 3000);
-      }).catch(err => alert("Erro ao copiar: " + err));
-    }
+    state.items.push({
+      name: materialData.name,
+      quantity: quantity,
+      unit: materialData.unit,
+      code: materialData.code
+    });
 
-    function sendToWhatsApp() {
-      const outputText = document.getElementById("outputText").textContent;
-      if (!outputText.trim()) {
-        alert("Nenhum carimbo gerado. Gere o carimbo primeiro.");
-        return;
-      }
-      const encodedText = encodeURIComponent(outputText);
-      window.open("https://wa.me/?text=" + encodedText, "_blank");
+    searchInput.value = "";
+    qty.value = "";
+    syncHidden();
+    render();
+    searchInput.focus();
+  };
+
+  addBtn.addEventListener("click", addMaterial);
+  qty.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addMaterial();
     }
+  });
+
+  hidden.__clearMaterials = () => {
+    state.items = [];
+    syncHidden();
+    render();
+  };
+
+  syncHidden();
+  render();
+}
+
+async function copyToClipboard() {
+  const text = $("outputText").innerText || "";
+  if (!text.trim()) return alert("Nenhum carimbo gerado. Gere o carimbo primeiro.");
+  try { await navigator.clipboard.writeText(text); } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.left = "-9999px";
+    document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove();
+  }
+  $("successMessage").classList.add("show");
+  setTimeout(() => $("successMessage").classList.remove("show"), 3000);
+}
+
+function sendToWhatsApp() {
+  const text = $("outputText").innerText || "";
+  if (!text.trim()) return alert("Nenhum carimbo gerado. Gere o carimbo primeiro.");
+  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+}
+
+function initBase() {
+  buildDatalist("supervisorList", SCHEMA.lists.supervisors.map(s => s.name));
+  buildDatalist("analistaList", SCHEMA.lists.analysts);
+  buildDatalist("tecnicoList", SCHEMA.lists.technicians);
+  buildDatalist("siteList", SCHEMA.lists.sites);
+
+  $("baseForm").innerHTML = renderForm(SCHEMA.baseFields);
+
+  // ✅ inicializa tabela de técnicos (substitui chips)
+  initTechsTableField("tecnicos", { delimiter: " / " });
+
+  $("carimbo_tipo").addEventListener("change", (e) => renderDynamic(e.target.value));
+  $("supervisor").addEventListener("input", function() {
+    const tel = supervisorPhones[normalizeName(this.value)];
+    $("supervisor_tel").value = tel ?? "";
+  });
+  $("btnCopy").addEventListener("click", copyToClipboard);
+  $("btnWhats").addEventListener("click", sendToWhatsApp);
+  renderDynamic($("carimbo_tipo").value);
+}
+
+document.addEventListener("DOMContentLoaded", initBase);
   </script>
 </body>
 </html>
