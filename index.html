@@ -327,7 +327,30 @@ stamp:(d)=>{
     {id:"prazo",label:"Prazo de Reparo",title:"PRAZO DE REPARO",fields:[{id:"prazoreparocargo",label:"Cargo",type:"text",value:"Coordenador",readonly:true,group:"two"},{id:"prazoreparonometel",label:"Nome / Telefone",type:"text",value:"João Andrioli / 41 99244-9441",readonly:true,group:"two"},{id:"prazoreparosla",label:"SLA do evento",type:"text",placeholder:"Ex: 4h, 2h",group:"two"},{id:"prazoreparoobs",label:"Observações",type:"text",placeholder:"Observações",group:"two"}],stamp:(d)=>["ESCALONAMENTO PRAZO REPARO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Cargo: ${d.prazoreparocargo}`,`Nome/Tel.: ${d.prazoreparonometel}`,`SLA do evento: ${d.prazoreparosla}`,`Obs.: ${d.prazoreparoobs}`,`Analista CCR: ${d.analista_ccr}`]},
     {id:"cire",label:"CIRE",title:"INTERVENÇÃO CIRE",fields:[{id:"cire_solicitante",label:"Solicitante",type:"text",placeholder:"Nome do Solicitante",group:"two"},{id:"cire_contato",label:"Meio de contato",type:"radio",name:"cire_contato",options:["Telefone","E-mail","WhatsApp"],group:"two"},{id:"cire_motivo",label:"Motivo",type:"textarea",placeholder:"Descreva o motivo da intervenção CIRE",group:"full"},{id:"cire_info",label:"Informação",type:"textarea",placeholder:"Informações adicionais",group:"full"},{id:"cire_previsao",label:"Previsão",type:"time",group:"two"}],stamp:(d)=>["INTERVENÇÃO CIRE","",`ID Ocorrência: ${d.id_ocorrencia}`,`Solicitante: ${d.cire_solicitante}`,`Meio de contato: ${d.cire_contato}`,`Motivo: ${d.cire_motivo}`,`Informação: ${d.cire_info}`,`Previsão: ${d.cire_previsao}`,`Analista CCR: ${d.analista_ccr}`]},
     {id:"escalonamento",label:"Escalonamento sem Equipe",title:"ESCALONAMENTO SEM EQUIPE",fields:[{id:"escalonamento_cargo",label:"Cargo",type:"text",value:"Coordenador",readonly:true,group:"two"},{id:"escalonamento_nome_tel",label:"Nome / Telefone",type:"text",value:"João Andrioli / 41 99244-9441",readonly:true,group:"two"},{id:"escalonamento_sla",label:"SLA do evento",type:"text",placeholder:"Ex: 4h, 2h",group:"two"},{id:"escalonamento_obs",label:"Observações",type:"text",placeholder:"Observações",group:"two"}],stamp:(d)=>["ESCALONAMENTO SEM EQUIPE","",`ID Ocorrência: ${d.id_ocorrencia}`,`Cargo: ${d.escalonamento_cargo}`,`Nome/Tel.: ${d.escalonamento_nome_tel}`,`SLA do evento: ${d.escalonamento_sla}`,`Obs.: ${d.escalonamento_obs}`,`Analista CCR: ${d.analista_ccr}`]},
-    {id:"cto_defeito",label:"CTO com Defeito",title:"CTO COM DEFEITO",fields:[{id:"cto_defeito_site",label:"Nome SITE/ARO",type:"datalist",listId:"siteList",listFrom:"sites",placeholder:"Digite para pesquisar ou selecione na lista",group:"two"},{id:"cto_defeito_splitter",label:"Splitter",type:"text",placeholder:"Ex: SP001, SP144",group:"two"},{id:"cto_defeito_caixa",label:"Caixa",type:"text",placeholder:"Ex: G0001, G0099, GP0050",group:"two"},{id:"cto_defeito_endereco",label:"Endereço",type:"text",placeholder:"Rua, Número, Complemento",group:"two"},{id:"cto_defeito_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},{id:"cto_defeito_tratativa",label:"Tratativa realizada",type:"textarea",placeholder:"Descreva a tratativa realizada",group:"full"},{id:"cto_defeito_material",label:"Materiais Utilizados",type:"materials",group:"full"}],stamp:(d)=>{const materials=JSON.parse(d.cto_defeito_material||"[]");const materialText=materials.length>0?"Materiais utilizados:\n"+materials.map(m=>`  - ${m.name}: ${m.quantity} ${m.unit} (${m.code})`).join("\n")+"\n":"Nenhum material registrado";return["CTO COM DEFEITO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Nome SITE/ARO: ${d.cto_defeito_site}`,`Splitter: ${d.cto_defeito_splitter}`,`Caixa: ${d.cto_defeito_caixa}`,`Endereço: ${d.cto_defeito_endereco}`,`Causa: ${d.cto_defeito_causa}`,`Tratativa realizada: ${d.cto_defeito_tratativa}`,materialText,`Analista CCR: ${d.analista_ccr}`]}}
+    {id:"cto_defeito",label:"CTO com Defeito",title:"CTO COM DEFEITO",fields:[{id:"cto_defeito_site",label:"Nome SITE/ARO",type:"datalist",listId:"siteList",listFrom:"sites",placeholder:"Digite para pesquisar ou selecione na lista",group:"two"},{id:"cto_defeito_splitter",label:"Splitter",type:"text",placeholder:"Ex: SP001, SP144",group:"two"},{id:"cto_defeito_caixa",label:"Caixa",type:"text",placeholder:"Ex: G0001, G0099, GP0050",group:"two"},{id:"cto_defeito_endereco",label:"Endereço",type:"text",placeholder:"Rua, Número, Complemento",group:"two"},{id:"cto_defeito_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},{id:"cto_defeito_tratativa",label:"Tratativa realizada",type:"textarea",placeholder:"Descreva a tratativa realizada",group:"full"},{id:"cto_defeito_material",label:"Materiais Utilizados",type:"materials",group:"full"}],
+stamp:(d)=>{
+  const materials=JSON.parse(d.cto_defeito_material||"[]");
+  const materialText=materials.length>0
+    ?"Materiais utilizados:\n"+materials.map(m=>`  - ${m.name}: ${m.quantity} ${m.unit} (${m.code})`).join("\n")+"\n"
+    :"Nenhum material registrado";
+  return [
+    "CTO COM DEFEITO","",
+    `ID Ocorrência: ${d.id_ocorrencia}`,
+    `Supervisor: ${d.supervisor}`,
+    `Telefone: ${d.supervisor_tel}`,
+    `Técnicos(s): ${d.tecnicos}`,
+    `Telefone: ${d.tecnico_tel}`,
+    `Nome SITE/ARO: ${d.cto_defeito_site}`,
+    `Splitter: ${d.cto_defeito_splitter}`,
+    `Caixa: ${d.cto_defeito_caixa}`,
+    `Endereço: ${d.cto_defeito_endereco}`,
+    `Causa: ${d.cto_defeito_causa}`,
+    `Tratativa realizada: ${d.cto_defeito_tratativa}`,
+    materialText,
+    `Analista CCR: ${d.analista_ccr}`
+  ]
+}
+}
   ]
 };
 
