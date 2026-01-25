@@ -370,14 +370,8 @@ function escapeHtml(s) {
 
 function linesToSafeHtml(lines) {
   return (lines || [])
-    .map(line =>
-      // 1) Escapa o conteúdo de cada linha (evita HTML indesejado)
-      escapeHtml(line)
-        // 2) Converte \n para <br> REAL (não escapado)
-        .replace(/\n/g, "<br>")
-    )
-    // 3) Quebra entre linhas
-    .join("<br>\n")
+    .map(line => escapeHtml(line).replace(/\n/g, "&lt;br&gt;"))
+    .join("&lt;br&gt;\n")
     .trim();
 }
 
