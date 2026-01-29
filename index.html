@@ -273,7 +273,7 @@ const SCHEMA = {
       {id:"certificacao_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},
       {id:"certificacao_subcausa",label:"Subcausa",type:"subcause_dynamic",dependsOn:"certificacao_causa",group:"full"},
       {id:"certificacao_material",label:"Materiais Utilizados",type:"materials",group:"full"},
-            {id:"certificacao_anexos",label:"Anexos (fotos/arquivos)",type:"file",accept:"image/*,application/pdf",multiple:true,capture:"environment",help:"Selecione fotos/arquivos. No celular, use a câmera se desejar.",group:"full"},
+            {id:"certificacao_anexos",label:"Anexos (fotos/arquivos)",type:"file",accept:"image/*,application/pdf",multiple:true,help:"Selecione fotos/arquivos. No celular, use a câmera se desejar.",group:"full"},
       {id:"certificacao_foto",label:"Foto em anexo",type:"radio",name:"certificacao_foto",options:["Sim","Não"],group:"full"}
     ],
     stamp:(d)=>{
@@ -305,11 +305,9 @@ return [
   `Técnicos(s): ${d.tecnicos}`,
   `Telefone: ${d.tecnico_tel}`,
   `Tratativa realizada: ${d.certificacao_tratativa}`,  `Causa: ${d.certificacao_causa || getLastCause() || "indisponível"}`,
-  `Causa (Carimbo 3): ${getLastCause() || "indisponível"}`,
   ...(d.certificacao_subcausa ? [`Subcausa: ${d.certificacao_subcausa}`] : []),
   ...materialLines,
   `Foto em anexo: ${d.certificacao_foto}`,
-      `Anexos selecionados: ${getFiles('certificacao_anexos').length ? getFiles('certificacao_anexos').map(f=>f.name).join(', ') : 'Nenhum'}` ,
   `Analista CCR: ${d.analista_ccr}`,
 
   // ✅ Agora em campos separados
@@ -858,10 +856,9 @@ function initTechsTableField(fieldId, { delimiter = " / " } = {}) {
     if (state.items.length === 0) { tableWrap.innerHTML = `<div class="muted">Nenhum técnico adicionado</div>`; return; }
     const table = document.createElement("table");
     const header = table.insertRow();
-    ["CONTATO", "MATRÍCULA", "COLABORADOR", ""].forEach(t => { const th = document.createElement("th"); th.textContent = t; header.appendChild(th); });
+    ["MATRÍCULA", "COLABORADOR", ""].forEach(t => { const th = document.createElement("th"); th.textContent = t; header.appendChild(th); });
     state.items.forEach((it, idx) => {
       const row = table.insertRow();
-      row.insertCell().textContent = formatPhoneBR(it.phone || "");
       row.insertCell().textContent = it.matricula || "";
       row.insertCell().textContent = it.name || "";
       const actions = row.insertCell(); actions.style.textAlign = "center";
