@@ -160,7 +160,7 @@ const SCHEMA = {
     technicians: ["placeholder"],
 
     sites: ["RSCBM_G1N01","RSCBM_O1A01","RSGUB_G1N01","RSNHO_G1I02","RSPAE_G1B95","RSPAE_G1C01","RSPAE_G1I22","RSPAE_G1I23","RSPAE_G1I24","RSPAE_G1I25","RSPAE_G1I26","RSPAE_G1I32","RSPAE_G1I33","RSPAE_G1I35","RSPAE_G1I41","RSPAE_G1I47","RSPAE_G1I48","RSPAE_G1I51","RSPAE_G1I55","RSPAE_G1I57","RSPAE_G1N42","RSPAE_G1N45","RSSLE_G1M01","RSSLE_O1A04"],
-    causes: ["Abalroamento","Furto","Acidente","Descarga","Vandalismo","Troca de poste","Degradação / Infiltração","Defeito Splitter","Falha em atividade anterior","Obra de terceiros","Interperie","Ataque de animais"],
+    causes: ["Abalroamento","Furto","Acidente","Descarga","Vandalismo","Troca de poste","Degradação / Infiltração","Defeito","Falha em atividade anterior","Obra de terceiros","Interperie","Ataque de animais","Sem defeito pra rede"],
     materials: [
       {id:"mat_0001",name:"ALÇA PREFORM P/ DROP ÓPT ASU ATÉ 12 FO",code:"0056-0003-0",unit:"un"},
       {id:"mat_0002",name:"SPLITTER OPT. PASSIVO 1:8-10 DB-FTTH",code:"0192-0219-9",unit:"un"},
@@ -259,9 +259,9 @@ const SCHEMA = {
     {id:"id_ocorrencia",label:"Ocorrência/Porta CTO (BA/TT)",type:"text",placeholder:"Ex: 123456",group:"two"},
     {id:"carimbo_tipo",label:"Selecione o Tipo de Carimbo",type:"select",optionsFrom:"types",group:"two"},
     {id:"supervisor",label:"Supervisor",type:"datalist",listId:"supervisorList",listFrom:"supervisors",placeholder:"Nome do Supervisor",group:"two"},
-    {id:"supervisor_tel",label:"Telefone Supervisor",type:"tel",placeholder:"(51) 9XXXX-XXXX",inputmode:"tel",group:"two"},
+    {id:"supervisor_tel",label:"Telefone Supervisor",type:"hidden",placeholder:"(51) 9XXXX-XXXX",inputmode:"tel",group:"two"},
     {id:"tecnicos",label:"Técnicos(s)",type:"tags",listId:"tecnicoList",listFrom:"technicians",placeholder:"Comece a digitar para pesquisar",group:"two"},
-    {id:"tecnico_tel",label:"Telefone Técnico",type:"tel",placeholder:"(51) 9XXXX-XXXX",inputmode:"tel",group:"two"},
+    {id:"tecnico_tel",label:"Telefone Técnico",type:"hidden",placeholder:"(51) 9XXXX-XXXX",inputmode:"tel",group:"two"},
     {id:"analista_ccr",label:"Analista CCR",type:"datalist",listId:"analistaList",listFrom:"analysts",placeholder:"Digite para pesquisar ou selecione na lista",group:"full"}
   ],
   types: [
@@ -271,7 +271,9 @@ const SCHEMA = {
     {id:"certificacao",label:"4. Certificação",title:"SOLICITAÇÃO DE CERTIFICAÇÃO",fields:[
       {id:"certificacao_tratativa",label:"Tratativa realizada",type:"textarea",placeholder:"Descrição da tratativa realizada",group:"full"},
       {id:"certificacao_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},
+      {id:"certificacao_subcausa",label:"Subcausa",type:"subcause_dynamic",dependsOn:"certificacao_causa",group:"full"},
       {id:"certificacao_material",label:"Materiais Utilizados",type:"materials",group:"full"},
+            {id:"certificacao_anexos",label:"Anexos (fotos/arquivos)",type:"file",accept:"image/*,application/pdf",multiple:true,capture:"environment",help:"Selecione fotos/arquivos. No celular, use a câmera se desejar.",group:"full"},
       {id:"certificacao_foto",label:"Foto em anexo",type:"radio",name:"certificacao_foto",options:["Sim","Não"],group:"full"}
     ],
     stamp:(d)=>{
@@ -302,10 +304,12 @@ return [
   `Telefone: ${d.supervisor_tel}`,
   `Técnicos(s): ${d.tecnicos}`,
   `Telefone: ${d.tecnico_tel}`,
-  `Tratativa realizada: ${d.certificacao_tratativa}`,
-  `Causa: ${d.certificacao_causa}`,
+  `Tratativa realizada: ${d.certificacao_tratativa}`,  `Causa: ${d.certificacao_causa || getLastCause() || "indisponível"}`,
+  `Causa (Carimbo 3): ${getLastCause() || "indisponível"}`,
+  ...(d.certificacao_subcausa ? [`Subcausa: ${d.certificacao_subcausa}`] : []),
   ...materialLines,
   `Foto em anexo: ${d.certificacao_foto}`,
+      `Anexos selecionados: ${getFiles('certificacao_anexos').length ? getFiles('certificacao_anexos').map(f=>f.name).join(', ') : 'Nenhum'}` ,
   `Analista CCR: ${d.analista_ccr}`,
 
   // ✅ Agora em campos separados
@@ -351,6 +355,26 @@ return [
   ]
 };
 
+
+// ====== SUBCAUSAS (Carimbo 4 usa a CAUSA do Carimbo 3 como sugestão) ======
+const SUBCAUSES = {
+  "Furto": ["Cabo", "CEO", "CTO", "Splitter"],
+  "Acidente": ["Carga alta", "Linha de pipa"],
+  "Descarga": ["Atmosferica", "Eletrica"],
+  "Degradação / Infiltração": ["CEO", "CTO", "DGOI"],
+  "Defeito": ["Splitter Atenuado", "Fibra curta", "Saída de Splitter", "Sem sinal"],
+  "Falha em atividade anterior": ["Atenuação", "Desorganização", "Fibra invertida", "Fibra quebrada"],
+  "Obra de terceiros": ["Outras obras", "Poda de Arvore", "Troca de poste não programada"],
+  "Ataque de animais": ["Abelha", "Formiga", "Outros", "Roedores"],
+  "Sem defeito pra rede": ["Encontrado OK"]
+};
+
+// Persistência da CAUSA do Carimbo 3 (Recuperação)
+const LAST_CAUSE_KEY = "last_cause_carimbo3";
+const setLastCause = (cause) => localStorage.setItem(LAST_CAUSE_KEY, (cause || "").trim());
+const getLastCause = () => (localStorage.getItem(LAST_CAUSE_KEY) || "").trim();
+
+
 // ====== MAPA DE CAMPOS OBRIGATÓRIOS (Observações REMOVIDAS) ======
 const REQUIRED = {
   acionamento: ["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","acionamento_prev_chegada","acionamento_site"],
@@ -381,6 +405,47 @@ if (Array.isArray(SCHEMA.lists.techDirectory) && SCHEMA.lists.techDirectory.leng
 
 const $ = (id) => document.getElementById(id);
 const normalizeName = (str) => (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+
+// ====== STORE DE ARQUIVOS (anexos) ======
+const FILE_STORE = Object.create(null);
+function registerFileInput(fieldId){
+  const el = document.getElementById(fieldId);
+  if(!el) return;
+  el.addEventListener('change', ()=>{ FILE_STORE[fieldId] = Array.from(el.files || []); });
+}
+function getFiles(fieldId){ return Array.from(FILE_STORE[fieldId] || []); }
+
+// ====== ENFORCE: campos com lista devem ser escolhidos da lista ======
+function getAllowedListForField(field){
+  if(!field || field.type !== 'datalist') return [];
+  const src = field.listFrom;
+  if(!src) return [];
+  if(src === 'supervisors') return (SCHEMA.lists.supervisors || []).map(s=>s.name);
+  return (SCHEMA.lists[src] || []).slice();
+}
+function isValueInAllowed(value, allowed){
+  const v = normalizeName(value);
+  return allowed.some(a => normalizeName(a) === v);
+}
+function attachDatalistEnforcement(fields){
+  (fields || []).filter(f=>f.type==='datalist').forEach(f=>{
+    const el = document.getElementById(f.id);
+    if(!el) return;
+    const allowed = getAllowedListForField(f);
+    const check = ()=>{
+      const val = (el.value || '').trim();
+      if(!val) return;
+      if(allowed.length && !isValueInAllowed(val, allowed)){
+        alert(`Selecione um valor da lista para: ${f.label || f.id}`);
+        el.value = '';
+        if(f.id === 'supervisor'){ const st = document.getElementById('supervisor_tel'); if(st) st.value = ''; }
+      }
+    };
+    el.addEventListener('blur', check);
+    el.addEventListener('change', check);
+  });
+}
 const supervisorPhones = Object.fromEntries(SCHEMA.lists.supervisors.map(s => [normalizeName(s.name), s.phone]));
 
 function formatPhoneBR(raw) {
@@ -422,11 +487,24 @@ function buildDatalist(id, values) {
 function groupClass(group) { return group === "full" ? "form-group full" : group === "three" ? "form-group three-col" : "form-group"; }
 
 function renderField(field) {
-  const { id, label, type, placeholder, value, readonly, inputmode, step, listId, listFrom, options, optionsFrom, name } = field;
+  const { id, label, type, placeholder, value, readonly, inputmode, step, listId, listFrom, options, optionsFrom, name, accept, multiple, capture, help } = field;
   const safeLabel = escapeHtml(label || ""), safeId = escapeHtml(id || ""), ro = readonly ? "readonly" : "", im = inputmode ? `inputmode="${escapeHtml(inputmode)}"` : "", st = step ? `step="${escapeHtml(step)}"` : "", ph = placeholder ? `placeholder="${escapeHtml(placeholder)}"` : "", val = (value !== undefined && value !== null) ? `value="${escapeHtml(value)}"` : "";
 
   if (type === "textarea") return `<div><label for="${safeId}">${safeLabel}</label><textarea id="${safeId}" ${ph} ${ro}>${escapeHtml(value ?? "")}</textarea></div>`;
-  if (type === "select") {
+
+if (type === "hidden") {
+  // Campo invisível (usado para telefones auto-preenchidos)
+  return `<div style="display:none"><input type="hidden" id="${safeId}" ${val} /></div>`;
+}
+if (type === "file") {
+  const acc = accept ? `accept="${escapeHtml(accept)}"` : "";
+  const mult = multiple ? "multiple" : "";
+  const cap = capture ? `capture="${escapeHtml(capture)}"` : "";
+  const hint = help ? `<div class="mini" style="margin-top:4px">${escapeHtml(help)}</div>` : "";
+  return `<div><label for="${safeId}">${safeLabel}</label><input type="file" id="${safeId}" ${acc} ${mult} ${cap} /></div>${hint}`;
+}
+
+if (type === "select") {
     const opts = optionsFrom ? (optionsFrom === "types" ? SCHEMA.types.map(t => ({ value: t.id, text: t.label })) : (SCHEMA.lists[optionsFrom] || []).map(v => ({ value: v, text: v }))) : (options || []).map(v => ({ value: v, text: v }));
     const first = (id === "carimbo_tipo") ? `<option value="">-- Selecione --</option>` : `<option value="" disabled selected>Selecione</option>`;
     return `<div><label for="${safeId}">${safeLabel}</label><select id="${safeId}">${first}${opts.map(o => `<option value="${escapeHtml(o.value)}">${escapeHtml(o.text)}</option>`).join("")}</select></div>`;
@@ -477,6 +555,21 @@ function renderField(field) {
       </div>
       <input type="hidden" id="${safeId}" value="[]" />
     </div>`;
+  }
+
+
+  // ====== Subcausa (select dinâmico) dependente de uma CAUSA ======
+  if (type === "subcause_dynamic") {
+    const dep = field.dependsOn || "";
+    return `
+      <div id="${safeId}_wrap" style="display:none">
+        <label for="${safeId}">${safeLabel}</label>
+        <select id="${safeId}" data-depends="${escapeHtml(dep)}">
+          <option value="">-- Selecione a Subcausa --</option>
+        </select>
+        <div class="mini" id="${safeId}_hint" style="margin-top:6px"></div>
+      </div>
+    `;
   }
 
   const inputType = escapeHtml(type || "text");
@@ -577,6 +670,60 @@ function attachAddressSuggest(inputId){
 }
 function initAddressSuggestForType(typeDef){ if(!typeDef || !typeDef.fields) return; const addressFieldIds = typeDef.fields.filter(f => ["recuperacao_endereco", "cto_defeito_endereco"].includes(f.id)).map(f => f.id); setTimeout(()=>{ addressFieldIds.forEach(attachAddressSuggest); }, 0); }
 
+
+// ====== Subcausa dinâmica (Carimbo 4): depende da CAUSA selecionada ======
+function initSubcauseDynamic(typeDef){
+  const fields = (typeDef?.fields || []).filter(f => f.type === "subcause_dynamic");
+  if (!fields.length) return;
+
+  fields.forEach(f => {
+    const subId = f.id;
+    const wrap = document.getElementById(`${subId}_wrap`);
+    const sel  = document.getElementById(subId);
+    const hint = document.getElementById(`${subId}_hint`);
+    const causeId = f.dependsOn;
+    const causeEl = document.getElementById(causeId);
+    if(!wrap || !sel || !causeEl) return;
+
+    // Para Carimbo 4: se a causa estiver vazia, sugere a última do Carimbo 3
+    if (typeDef.id === "certificacao") {
+      const last = getLastCause();
+      if (!causeEl.value && last) causeEl.value = last;
+    }
+
+    function refresh(){
+      const cause = (causeEl.value || "").trim() || getLastCause();
+      const options = SUBCAUSES[cause] || [];
+
+      if(!cause){
+        wrap.style.display = "none";
+        sel.innerHTML = `<option value="">-- Selecione a Subcausa --</option>`;
+        sel.value = "";
+        if(hint) hint.textContent = "Causa (Carimbo 3) não informada";
+        return;
+      }
+
+      // Se a causa não tiver subcausas, esconde subcausa
+      if(!options.length){
+        wrap.style.display = "none";
+        sel.innerHTML = `<option value="">-- Selecione a Subcausa --</option>`;
+        sel.value = "";
+        if(hint) hint.textContent = `Causa selecionada: ${cause} (sem subcausa)`;
+        return;
+      }
+
+      sel.innerHTML = `<option value="">-- Selecione a Subcausa --</option>` +
+        options.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join("");
+
+      wrap.style.display = "block";
+      if(hint) hint.textContent = `Causa selecionada: ${cause} | Última (Carimbo 3): ${getLastCause() || "-"}`;
+    }
+
+    causeEl.addEventListener("change", refresh);
+    refresh();
+  });
+}
+
 // ====== GEO Utils (uso exclusivo no carimbo Certificação) ======
 function formatLocalDateTime(ts = Date.now()) { try { return new Date(ts).toLocaleString("pt-BR", { hour12:false }); } catch { return new Date().toISOString(); } }
 function getCurrentPositionText({ timeoutMs = 8000, enableHighAccuracy = true } = {}) { return new Promise((resolve) => { if (!("geolocation" in navigator)) { return resolve("indisponível"); } const onSuccess = (pos) => { const { latitude:lat, longitude:lng, accuracy:acc } = pos.coords || {}; if (lat == null || lng == null) return resolve("indisponível"); const latStr = Number(lat).toFixed(6); const lngStr = Number(lng).toFixed(6); const accStr = (acc != null) ? ` ±${Math.round(acc)}m` : ""; const when = formatLocalDateTime(Date.now()); resolve(`${latStr}, ${lngStr}${accStr} | ${when}`); }; const onError = () => resolve("indisponível"); try { navigator.geolocation.getCurrentPosition(onSuccess, onError, { enableHighAccuracy, timeout: timeoutMs, maximumAge: 0 }); } catch { resolve("indisponível"); } }); }
@@ -604,7 +751,41 @@ function validateRequired(typeDef, data) {
     }
   }
 
-  return missing;
+  
+
+
+  // ✅ Carimbo 4 (Certificação): Causa pode ser selecionada aqui, mas sugere a última do Carimbo 3
+  if (typeId === "certificacao") {
+    const causeSel = (data.certificacao_causa || "").trim();
+    const cause3 = getLastCause();
+    const cause = causeSel || cause3;
+
+    if (!cause) {
+      if (!missing.includes("Causa (Carimbo 4)")) missing.push("Causa (Carimbo 4)");
+    }
+
+    const opts = SUBCAUSES[cause] || [];
+    if (opts.length > 0) {
+      const sub = (data.certificacao_subcausa || "").trim();
+      if (!sub) {
+        if (!missing.includes("Subcausa")) missing.push("Subcausa");
+      }
+    }
+  }
+
+// Campos do tipo datalist: obrigar seleção da lista (sem digitação livre)
+const allFields = [...(SCHEMA.baseFields || []), ...(typeDef.fields || [])];
+allFields.filter(f=>f.type==='datalist').forEach(f=>{
+  const val = (data[f.id] || '').toString().trim();
+  if(!val) return;
+  const allowed = getAllowedListForField(f);
+  if(allowed.length && !isValueInAllowed(val, allowed)){
+    const lab = (f.label || f.id);
+    if(!missing.includes(lab)) missing.push(lab + ' (selecione da lista)');
+  }
+});
+
+return missing;
 }
 
 function renderDynamic(typeId) {
@@ -618,6 +799,12 @@ function renderDynamic(typeId) {
   $("btnGenerate").addEventListener("click", async () => {
     let data = collectData(typeDef);
 
+
+
+    // ✅ Carimbo 3 (Recuperação): salva a Causa selecionada para uso no Carimbo 4
+    if (typeDef.id === "recuperacao") {
+      setLastCause(data.recuperacao_causa || "");
+    }
     // Captura GEO apenas para Certificação (obrigatório)
     if (typeDef.id === "certificacao") {
       try { data.certificacao_geo = await getCurrentPositionText({ timeoutMs: 8000, enableHighAccuracy: true }); }
@@ -638,8 +825,21 @@ function renderDynamic(typeId) {
   $("btnClear").addEventListener("click", () => clearTypeFields(typeDef));
 
   setTimeout(() => {
-    for (const f of typeDef.fields) { if (f.type === "materials") initMaterialsField(f.id); }
+    for (const f of typeDef.fields) {
+      if (f.type === "materials") initMaterialsField(f.id);
+      if (f.type === "file") registerFileInput(f.id);
+    }
+    attachDatalistEnforcement(typeDef.fields);
     initAddressSuggestForType(typeDef);
+
+    // ✅ Subcausa dinâmica (Carimbo 4)
+    initSubcauseDynamic(typeDef);
+
+    // ✅ Atualiza a Causa salva ao trocar no Carimbo 3
+    if (typeDef.id === "recuperacao") {
+      const el = document.getElementById("recuperacao_causa");
+      if (el) el.addEventListener("change", () => setLastCause(el.value || ""));
+    }
   }, 0);
 }
 
@@ -744,7 +944,29 @@ async function copyToClipboard() {
 function sendToWhatsApp() {
   const text = $("outputText").innerText || "";
   if (!text.trim()) return alert("Nenhum carimbo gerado. Gere o carimbo primeiro.");
+
+  const typeId = $("carimbo_tipo")?.value || "";
+  const files = (typeId === "certificacao") ? getFiles("certificacao_anexos") : [];
+
+  // ✅ No celular, tenta compartilhar texto + anexos via Web Share (funciona com WhatsApp quando suportado)
+  if (files.length && navigator.share && navigator.canShare) {
+    try {
+      if (navigator.canShare({ files })) {
+        navigator.share({ title: "Carimbo", text, files }).catch(() => {
+          window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+        });
+        return;
+      }
+    } catch (e) {
+      // segue fallback
+    }
+  }
+
+  // Fallback (desktop/whatsapp web): somente texto
   window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+  if (files.length) {
+    setTimeout(() => alert("⚠️ Seu navegador/WhatsApp Web não permite anexar arquivos automaticamente. Anexe manualmente os arquivos selecionados."), 300);
+  }
 }
 
 function initBase() {
@@ -755,6 +977,7 @@ function initBase() {
   buildDatalist("siteList", SCHEMA.lists.sites);
 
   $("baseForm").innerHTML = renderForm(SCHEMA.baseFields);
+  attachDatalistEnforcement(SCHEMA.baseFields);
 
   initTechsTableField("tecnicos", { delimiter: " / " });
   $("carimbo_tipo").addEventListener("change", (e) => renderDynamic(e.target.value));
