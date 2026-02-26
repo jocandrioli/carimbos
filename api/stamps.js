@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const { neon } = require("@neondatabase/serverless");
 
 const SALT = "carimbos-gpon-rs-capital-2024";
 
@@ -13,30 +12,32 @@ function checkAuth(req, res) {
   return true;
 }
 
-let _sql = null;
-function getDb() {
-  if (!_sql) {
-    const url = process.env.POSTGRES_URL || process.env.DATABASE_URL;
-    if (!url) throw new Error("POSTGRES_URL não encontrada.");
-    _sql = neon(url);
-  }
-  return _sql;
+function getDbUrl() {
+  // Tenta sem prefixo e com prefixo carimbosgpon_
+  return process.env.POSTGRES_URL
+    || process.env.carimbosgpon_POSTGRES_URL
+    || process.env.DATABASE_URL
+    || process.env.carimbosgpon_DATABASE_URL
+    || null;
 }
 
 module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (!checkAuth(req, res)) return;
 
-  const sql = getDb();
-
   try {
-    // ── POST: salvar carimbo ──
+    const url = getDbUrl();
+    if (!url) throw new Error("Variavel de conexao do banco nao encontrada.");
+
+    const { neon } = require("@neondatabase/serverless");
+    const sql = neon(url);
+
     if (req.method === "POST") {
       const { tipo, id_ocorrencia, supervisor, tecnicos, analista_ccr,
               texto_gerado, dados_formulario, geo_lat, geo_lng, geo_accuracy } = req.body || {};
 
       if (!tipo || !texto_gerado) {
-        return res.status(400).json({ error: "Campos 'tipo' e 'texto_gerado' são obrigatórios." });
+        return res.status(400).json({ error: "Campos 'tipo' e 'texto_gerado' sao obrigatorios." });
       }
 
       const result = await sql`
@@ -51,7 +52,6 @@ module.exports = async function handler(req, res) {
       return res.status(201).json({ ok: true, id: result[0].id, created_at: result[0].created_at });
     }
 
-    // ── GET: listar carimbos ──
     if (req.method === "GET") {
       const { page = "1", limit = "50", tipo, id_ocorrencia } = req.query || {};
       const pg = Math.max(1, parseInt(page));
@@ -78,10 +78,10 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    return res.status(405).json({ error: "Método não permitido." });
+    return res.status(405).json({ error: "Metodo nao permitido." });
 
   } catch (err) {
     console.error("Stamps error:", err);
-    return res.status(500).json({ error: "Erro no banco de dados.", details: err.message });
+    return res.status(500).json({ error: err.message || "Erro no banco de dados." });
   }
 };
