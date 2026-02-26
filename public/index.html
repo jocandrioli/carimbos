@@ -216,11 +216,17 @@ async function doLogin(){
   btn.disabled=true; err.textContent="";
   try{
     const r=await fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})});
+    if(!r.ok){
+      let msg="Senha incorreta.";
+      try{const d=await r.json();msg=d.error||msg}catch{}
+      if(r.status===404)msg="API não encontrada. Verifique o deploy.";
+      if(r.status===500)msg="Erro no servidor. Verifique APP_PASSWORD nas variáveis da Vercel.";
+      err.textContent=msg;return;
+    }
     const d=await r.json();
-    if(!r.ok){err.textContent=d.error||"Senha incorreta.";return}
     setToken(d.token);
     await boot();
-  }catch(e){err.textContent="Erro de conexão."}
+  }catch(e){err.textContent="Erro de conexão: "+e.message}
   finally{btn.disabled=false}
 }
 
