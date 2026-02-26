@@ -306,7 +306,7 @@ const getLastCause=()=>(localStorage.getItem("lc3")||"").trim();
 // ── Helpers ──
 const norm=s=>(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
 const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-const safeHtml=lines=>(lines||[]).map(l=>esc(l)).join("<br>\n").trim();
+const linesToSafeHtml=lines=>(lines||[]).map(l=>esc(l).replace(/\n/g,"&lt;br&gt;")).join("&lt;br&gt;\n").trim();
 const fmtPhone=r=>{const d=String(r||"").replace(/\D/g,"");if(d.length===11)return`(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;if(d.length===10)return`(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;return r||""};
 const gl=k=>(L&&L[k])||[];
 const gc=g=>g==="full"?"form-group full":g==="three"?"form-group three-col":"form-group";
@@ -400,9 +400,10 @@ async function saveDB(td,d,txt){
     const cm=g.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);if(cm){gLat=+cm[1];gLng=+cm[2]}
     const am=g.match(/±\s*(\d+(?:\.\d+)?)\s*m/i);if(am)gAcc=+am[1];
     const r=await api("/stamps",{method:"POST",body:JSON.stringify({tipo:td.id,id_ocorrencia:d.id_ocorrencia||null,supervisor:d.supervisor||null,tecnicos:d.tecnicos||null,analista_ccr:d.analista_ccr||null,texto_gerado:txt,dados_formulario:d,geo_lat:gLat,geo_lng:gLng,geo_accuracy:gAcc})});
-    const j=await r.json();
+    const txt2=await r.text();
+    let j;try{j=JSON.parse(txt2)}catch{throw new Error("Servidor retornou erro (HTTP "+r.status+"): "+txt2.substring(0,120))}
     if(r.ok){el.textContent=`✅ Salvo no banco (ID: ${j.id})`;el.className="db-msg ok"}
-    else throw new Error(j.error||"Erro");
+    else throw new Error(j.error||"Erro HTTP "+r.status);
   }catch(e){el.textContent=`⚠️ Erro ao salvar: ${e.message}`;el.className="db-msg err"}
 }
 
@@ -419,8 +420,8 @@ function renderDyn(typeId){
     if(td.id==="certificacao"){try{d.certificacao_geo=await getGeo()}catch{d.certificacao_geo="indisponível"}}
     const miss=validate(td,d);
     if(miss.length){alert("Preencha os campos obrigatórios:\n\n- "+miss.join("\n- "));hideOut();return}
-    const lines=td.stamp(d);showOut(safeHtml(lines));
-    saveDB(td,d,lines.join("\n"));
+    const lines=td.stamp(d);showOut(linesToSafeHtml(lines));
+    saveDB(td,d,$("outputText").innerText);
   });
 
   $("btnClr").addEventListener("click",()=>clearFields(td));
