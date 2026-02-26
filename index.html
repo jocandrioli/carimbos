@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gerador de Carimbo - Acionamento GPON</title>
+  <style>
+.suggest-box{position:relative}
+:root{--primary:#003366;--primary-2:#004d99;--accent:#ff6600;--info:#0066cc;--bg:#f5f5f5;--panel:#fafafa;--text:#333;--muted:#666;--border:#ddd;--border-2:#999;--radius:8px;--danger:#dc3545}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:var(--bg);padding:20px;line-height:1.6;color:var(--text)}
+.container{max-width:1000px;margin:0 auto;background:#fff;border-radius:var(--radius);box-shadow:0 2px 8px rgba(0,0,0,.1);overflow:hidden}
+.header{background:var(--primary);color:#fff;padding:20px;text-align:center;position:relative}
+.header h1{font-size:24px;margin-bottom:5px}
+.header p{font-size:12px;opacity:.9}
+.header-section{background:#f9f9f9;padding:20px;border-bottom:2px solid var(--primary-2)}
+.header-section h2{color:var(--primary);font-size:16px;margin-bottom:15px}
+.section{margin-bottom:20px;padding:15px;border:1px solid var(--border);border-radius:4px;background:var(--panel)}
+.section-title{font-weight:700;color:var(--primary);margin-bottom:12px;font-size:14px;border-bottom:2px solid var(--accent);padding-bottom:8px}
+.dynamic-content{padding:20px}
+.dynamic-content .hint{color:var(--muted);text-align:center;padding:40px 20px}
+.form-group{margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group.full{grid-template-columns:1fr}
+.form-group.three-col{grid-template-columns:1fr 1fr 1fr}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+input[type="text"],input[type="tel"],input[type="number"],input[type="time"],input[type="password"],textarea,select{width:100%;padding:8px;border:1px solid var(--border-2);border-radius:4px;font-size:12px;font-family:Arial,sans-serif}
+textarea{resize:vertical;min-height:60px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fffef0}
+.checkbox-group{display:flex;gap:15px;margin-top:8px;flex-wrap:wrap}
+.checkbox-group label{display:inline-flex;align-items:center;margin-bottom:0;font-weight:600}
+.checkbox-group input{width:auto;margin-right:6px}
+.actions{display:flex;gap:10px;margin-top:20px;justify-content:space-between;flex-wrap:wrap}
+button{padding:10px 20px;font-size:12px;border:0;border-radius:4px;cursor:pointer;font-weight:700;transition:.3s}
+.btn-generate{background:var(--accent);color:#fff;flex:1;min-width:160px}
+.btn-generate:hover{background:#e55a00}
+.btn-clear{background:#999;color:#fff;flex:1;min-width:160px}
+.btn-clear:hover{background:#777}
+.btn-copy{background:var(--info);color:#fff;flex:1;min-width:160px}
+.btn-copy:hover{background:#0052a3}
+.output-section{margin:20px;padding:15px;background:#f0f0f0;border:1px solid var(--border);border-radius:4px;display:none}
+.output-section.active{display:block}
+.output-section h3{color:var(--primary);margin-bottom:10px;font-size:14px}
+.output-text{background:#fff;padding:12px;border:1px solid var(--border-2);border-radius:4px;font-family:"Courier New",monospace;font-size:11px;line-height:1.6;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.success-message{background:#d4edda;color:#155724;padding:10px;border-radius:4px;margin-top:10px;font-size:12px;display:none}
+.success-message.show{display:block}
+.mini{font-size:11px;color:var(--muted)}
+.tags-wrap{border:1px solid var(--border-2);border-radius:4px;padding:6px;background:#fff}
+.tags-row{display:flex;gap:8px;align-items:center}
+.tags-row input{border:1px solid var(--border);flex:1}
+.tags-row .btn-add{padding:8px 10px;flex:0;background:var(--info)}
+.materials-wrap{border:1px solid var(--border-2);border-radius:4px;padding:10px;background:#fff}
+.materials-list{margin-bottom:12px;max-height:250px;overflow-y:auto}
+.materials-list table{width:100%;border-collapse:collapse;font-size:12px}
+.materials-list table th,.materials-list table td{border:1px solid var(--border);padding:6px;text-align:left}
+.materials-list table th{background:#f0f0f0;font-weight:700}
+.materials-add{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.materials-add select,.materials-add input{padding:8px;border:1px solid var(--border-2);border-radius:4px;font-size:12px}
+.materials-add select{flex:1;min-width:200px}
+.materials-add input[type="number"]{width:80px}
+.materials-empty{color:var(--muted);padding:8px 0;font-size:12px}
+.tech-table{margin-top:10px}
+.tech-table table{width:100%;border-collapse:collapse;font-size:12px}
+.tech-table th,.tech-table td{border:1px solid var(--border);padding:6px;text-align:left}
+.tech-table th{background:#f0f0f0;font-weight:700}
+.tech-table .btn-x{background:transparent;border:none;cursor:pointer;color:var(--accent);font-weight:700}
+.tech-table .muted{color:var(--muted);font-size:12px;padding:6px 0}
+
+/* ══ LOGIN ══ */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:80vh}
+.login-box{background:#fff;border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,.15);padding:40px;width:100%;max-width:380px;text-align:center}
+.login-box .logo{font-size:48px;margin-bottom:8px}
+.login-box h2{color:var(--primary);margin-bottom:4px;font-size:20px}
+.login-box .sub{color:var(--muted);font-size:12px;margin-bottom:24px}
+.login-box .field{margin-bottom:16px;text-align:left}
+.login-box .field label{font-size:13px;font-weight:700;margin-bottom:6px;display:block}
+.login-box .field input{padding:12px;font-size:14px}
+.btn-login{background:var(--primary);color:#fff;width:100%;padding:14px;font-size:14px;border-radius:4px;border:0;cursor:pointer;font-weight:700}
+.btn-login:hover{background:var(--primary-2)}
+.btn-login:disabled{opacity:.5;cursor:not-allowed}
+.login-err{color:var(--danger);font-size:12px;margin-top:10px;min-height:18px}
+
+/* ══ NAVBAR ══ */
+.nav-bar{display:flex;justify-content:flex-end;gap:8px;padding:6px 16px;background:rgba(0,0,0,.15)}
+.nav-bar button{background:rgba(255,255,255,.18);color:#fff;padding:5px 12px;font-size:11px;border-radius:3px;border:0;cursor:pointer}
+.nav-bar button:hover{background:rgba(255,255,255,.32)}
+
+/* ══ DB FEEDBACK ══ */
+.db-msg{padding:8px 12px;border-radius:4px;font-size:11px;margin-top:8px;display:none}
+.db-msg.ok{display:block;background:#d4edda;color:#155724}
+.db-msg.err{display:block;background:#f8d7da;color:#721c24}
+
+/* ══ MODAL ══ */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:var(--radius);max-width:920px;width:95%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-head{padding:14px 20px;background:var(--primary);color:#fff;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:15px}
+.modal-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:2px 8px}
+.modal-body{padding:16px;overflow-y:auto;flex:1}
+.modal-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.modal-filters input,.modal-filters select{padding:6px 10px;border:1px solid var(--border-2);border-radius:4px;font-size:12px}
+.htable{width:100%;border-collapse:collapse;font-size:11px}
+.htable th,.htable td{border:1px solid var(--border);padding:5px 7px;text-align:left}
+.htable th{background:#f0f0f0;font-weight:700;position:sticky;top:0}
+.htable .prev{max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.htable .prev:hover{white-space:normal;word-break:break-word}
+.hpages{display:flex;gap:6px;justify-content:center;margin-top:12px}
+.hpages button{padding:5px 10px;font-size:11px;border:1px solid var(--border-2);border-radius:3px;background:#fff;cursor:pointer}
+.hpages button.cur{background:var(--primary);color:#fff;border-color:var(--primary)}
+.hempty{color:var(--muted);text-align:center;padding:30px}
+
+/* ══ LOADING ══ */
+.load-ov{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.load-ov.show{display:flex}
+.spin{width:36px;height:36px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load-ov span{color:var(--primary);font-size:13px;font-weight:700}
+
+@media(max-width:768px){.form-group,.form-group.three-col{grid-template-columns:1fr}.actions{flex-direction:column}button{width:100%}.tags-row{flex-direction:column;align-items:stretch}.tags-row .btn-add{width:100%}.materials-add{flex-direction:column;align-items:stretch}.materials-add select,.materials-add input{width:100%}.modal{width:100%;max-height:100vh;border-radius:0}.modal-filters{flex-direction:column}}
+  </style>
+</head>
+<body>
+<div class="load-ov" id="loader"><div class="spin"></div><span id="loaderTxt">Carregando...</span></div>
+
+<!-- ══ LOGIN ══ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="logo">📋</div>
+    <h2>Gerador de Carimbo</h2>
+    <div class="sub">RS-CAPITAL • GPON • Vivo Rede</div>
+    <div class="field">
+      <label for="pw">Senha de Acesso</label>
+      <input type="password" id="pw" placeholder="Digite a senha" autocomplete="current-password"/>
+    </div>
+    <button class="btn-login" id="btnLogin">Entrar</button>
+    <div class="login-err" id="loginErr">&nbsp;</div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="container" id="app" style="display:none">
+  <div class="header">
+    <div class="nav-bar">
+      <button id="btnHist">📊 Histórico</button>
+      <button id="btnLogout">Sair</button>
+    </div>
+    <h1>📋 Gerador de Carimbo - RS-CAPITAL</h1>
+    <p>Sistema de Acionamento - GPON - Vivo Rede</p>
+  </div>
+  <div class="header-section">
+    <h2>Dados Gerais (Preenchidos para todos os carimbos)</h2>
+    <div id="baseForm"></div>
+    <div class="mini">* Campos específicos aparecem após selecionar o tipo de carimbo.</div>
+  </div>
+  <div class="dynamic-content"><div id="dynamicRoot"></div></div>
+  <div id="output" class="output-section">
+    <h3>Carimbo de Texto Gerado</h3>
+    <div class="output-text" id="outputText"></div>
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
+      <button class="btn-copy" id="btnCopy">Copiar para Área de Transferência</button>
+      <button class="btn-copy" id="btnWhats" style="background:#25d366;">Enviar via WhatsApp</button>
+    </div>
+    <div class="success-message" id="successMsg">Texto copiado para a área de transferência!</div>
+    <div class="db-msg" id="dbMsg"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL HISTÓRICO ══ -->
+<div class="modal-bg" id="histModal">
+  <div class="modal">
+    <div class="modal-head"><h3>📊 Histórico de Carimbos</h3><button class="modal-close" id="histClose">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-filters">
+        <select id="hfTipo"><option value="">Todos os tipos</option></select>
+        <input type="text" id="hfOc" placeholder="Buscar ocorrência..."/>
+        <button class="btn-copy" id="hfGo" style="padding:6px 12px">Buscar</button>
+      </div>
+      <div id="histBody"><div class="hempty">Carregando...</div></div>
+      <div class="hpages" id="histPages"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   ZERO DADOS SENSÍVEIS NESTE ARQUIVO
+   Tudo vem da API /api/schema após autenticação
+   ═══════════════════════════════════════════════ */
+
+// ── Auth helpers ──
+const getToken=()=>localStorage.getItem("gpon_token")||"";
+const setToken=t=>localStorage.setItem("gpon_token",t);
+const clearToken=()=>localStorage.removeItem("gpon_token");
+
+async function api(path,opts={}){
+  const h={"Content-Type":"application/json",...(opts.headers||{})};
+  const t=getToken(); if(t) h["Authorization"]="Bearer "+t;
+  const r=await fetch("/api"+path,{...opts,headers:h});
+  if(r.status===401){clearToken();showLogin();throw new Error("Sessão expirada")}
+  return r;
+}
+
+// ── UI toggles ──
+const $=id=>document.getElementById(id);
+const showLogin=()=>{$("loginScreen").style.display="flex";$("app").style.display="none"};
+const showApp=()=>{$("loginScreen").style.display="none";$("app").style.display="block"};
+const showLoader=(t="Carregando...")=>{$("loaderTxt").textContent=t;$("loader").classList.add("show")};
+const hideLoader=()=>$("loader").classList.remove("show");
+
+// ── Schema (populated after login) ──
+let L=null; // L = LISTS from API
+
+async function doLogin(){
+  const pw=$("pw").value.trim(), err=$("loginErr"), btn=$("btnLogin");
+  if(!pw){err.textContent="Informe a senha.";return}
+  btn.disabled=true; err.textContent="";
+  try{
+    const r=await fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pw})});
+    const d=await r.json();
+    if(!r.ok){err.textContent=d.error||"Senha incorreta.";return}
+    setToken(d.token);
+    await boot();
+  }catch(e){err.textContent="Erro de conexão."}
+  finally{btn.disabled=false}
+}
+
+async function boot(){
+  showLoader("Carregando dados...");
+  try{
+    const r=await api("/schema"); const d=await r.json();
+    if(!r.ok) throw new Error(d.error);
+    L=d.lists;
+    if(L.techDirectory){
+      L.technicians=[...new Set(L.techDirectory.map(t=>t.name))].sort((a,b)=>a.localeCompare(b,"pt-BR",{sensitivity:"base"}));
+    }
+    showApp(); initBase();
+  }catch(e){alert("Erro: "+e.message);clearToken();showLogin()}
+  finally{hideLoader()}
+}
+
+// ── Stamp type definitions (field configs + stamp formatters — NO data) ──
+const TYPES=[
+  {id:"acionamento",label:"1. Acionamento",title:"ACIONAMENTO",fields:[{id:"acionamento_prev_chegada",label:"Previsão de chegada ao SITE/ARO para medições",type:"time",group:"two"},{id:"acionamento_site",label:"Nome SITE/ARO para medições",type:"datalist",listId:"siteList",listFrom:"sites",placeholder:"Digite para pesquisar",group:"two"}],stamp:d=>["1 - ACIONAMENTO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Previsão de chegada ao SITE/ARO para medições: ${d.acionamento_prev_chegada}`,`Nome SITE/ARO para medições: ${d.acionamento_site}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"deslocamento",label:"2. Deslocamento ao Ponto da Falha",title:"DESLOCAMENTO AO PONTO DA FALHA",fields:[{id:"deslocamento_km",label:"KM até o LOCAL da falha",type:"number",step:"0.1",placeholder:"Ex: 15.5",group:"two"},{id:"deslocamento_prev_chegada",label:"Previsão de chegada ao LOCAL da falha",type:"time",group:"two"},{id:"deslocamento_obs",label:"Observações",type:"textarea",placeholder:"Observações sobre o deslocamento",group:"full"}],stamp:d=>["2 - DESLOCAMENTO AO PONTO DA FALHA","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`KM até o LOCAL da falha: ${d.deslocamento_km} km`,`Previsão de chegada ao LOCAL da falha: ${d.deslocamento_prev_chegada}`,`Obs.: ${d.deslocamento_obs}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"recuperacao",label:"3. Recuperação da Falha",title:"RECUPERAÇÃO DA FALHA",fields:[{id:"recuperacao_causa",label:"Causa raiz",type:"select",optionsFrom:"causes",group:"two"},{id:"recuperacao_prev_testes",label:"Previsão para solicitação de testes",type:"time",group:"two"},{id:"recuperacao_endereco",label:"Endereço da falha",type:"text",placeholder:"Rua, Número, Complemento",group:"two"},{id:"recuperacao_cabo",label:"Cabo / Capacidade / ARO",type:"select",options:["Drop Fig8 4F","12F","24F","36F","48F","72F","144F","288F"],group:"two"},{id:"recuperacao_tratativas",label:"Tratativas realizadas",type:"textarea",placeholder:"Descreva as tratativas",group:"full"},{id:"recuperacao_obs",label:"Observações",type:"textarea",placeholder:"Observações gerais",group:"full"}],stamp:d=>["3 - RECUPERAÇÃO DA FALHA","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Causa raiz: ${d.recuperacao_causa}`,`Previsão para solicitação de testes: ${d.recuperacao_prev_testes}`,`Endereço da falha: ${d.recuperacao_endereco}`,`Cabo/Capacidade/ARO: ${d.recuperacao_cabo}`,`Tratativas realizadas: ${d.recuperacao_tratativas}`,`Obs.: ${d.recuperacao_obs}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"certificacao",label:"4. Certificação",title:"SOLICITAÇÃO DE CERTIFICAÇÃO",fields:[
+    {id:"certificacao_tratativa",label:"Tratativa realizada",type:"textarea",placeholder:"Descrição da tratativa realizada",group:"full"},
+    {id:"certificacao_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},
+    {id:"certificacao_subcausa",label:"Subcausa",type:"subcause_dynamic",dependsOn:"certificacao_causa",group:"full"},
+    {id:"certificacao_material",label:"Materiais Utilizados",type:"materials",group:"full"},
+    {id:"certificacao_anexos",label:"Anexos (fotos/arquivos)",type:"file",accept:"image/*,application/pdf",multiple:true,help:"Selecione fotos/arquivos. No celular, use a câmera se desejar.",group:"full"},
+    {id:"certificacao_foto",label:"Foto em anexo",type:"radio",name:"certificacao_foto",options:["Sim","Não"],group:"full"}
+  ],stamp:d=>{
+    const mats=JSON.parse(d.certificacao_material||"[]");
+    const ml=mats.length?["Materiais utilizados:",...mats.map(m=>`  - ${m.name}: ${m.quantity} ${m.unit} (${m.code})`)]
+      :["Nenhum material registrado"];
+    const g=String(d.certificacao_geo||"indisponível"),parts=g.split("|").map(s=>s.trim()),left=parts[0]||"",tp=parts[1]||"";
+    const cm=left.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/),ll=cm?`${cm[1]}, ${cm[2]}`:"indisponível";
+    const am=left.match(/±\s*(\d+(?:\.\d+)?)\s*m/i),ac=am?`±${am[1]}m`:"indisponível";
+    return["4 - SOLICITAÇÃO DE CERTIFICAÇÃO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Tratativa realizada: ${d.certificacao_tratativa}`,`Causa: ${d.certificacao_causa||getLastCause()||"indisponível"}`,...(d.certificacao_subcausa?[`Subcausa: ${d.certificacao_subcausa}`]:[]),...ml,`Foto em anexo: ${d.certificacao_foto}`,`Analista CCR: ${d.analista_ccr}`,`Lat./Long.: ${ll}`,`Acurácia: ${ac}`,`Data/Hora: ${tp||"indisponível"}`]}},
+  {id:"complementar",label:"Complementar",title:"COMPLEMENTAR",fields:[{id:"complementar_motivo",label:"Motivo",type:"text",placeholder:"Motivo da complementação",group:"two"},{id:"complementar_info",label:"Informação",type:"text",placeholder:"Informação adicional",group:"two"},{id:"nova_previsao",label:"Nova previsão?",type:"radio",name:"nova_previsao",options:["Sim","Não"],group:"two"},{id:"complementar_previsao",label:"Previsão",type:"time",group:"two"}],stamp:d=>["COMPLEMENTAR","",`ID Ocorrência: ${d.id_ocorrencia}`,`Motivo: ${d.complementar_motivo}`,`Informação: ${d.complementar_info}`,`Nova previsão? ${d.nova_previsao}`,`Previsão: ${d.complementar_previsao}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"naofalha",label:"Não há Falha para Rede",title:"NÃO HÁ FALHA PARA REDE",fields:[{id:"naofalha_motivo",label:"Motivo da Improdutiva",type:"textarea",placeholder:"Descreva o motivo da improdutiva",group:"full"},{id:"naofalha_foto",label:"Foto em anexo",type:"radio",name:"naofalha_foto",options:["Sim","Não"],group:"two"},{id:"naofalha_gestor",label:"Ciente (Gestor VIVO Rede)",type:"text",value:"João Andrioli",readonly:true,group:"two"}],stamp:d=>["NÃO HÁ FALHA PARA REDE/ IMPROCEDÊNCIA","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Motivo da improdutiva: ${d.naofalha_motivo}`,`Foto em anexo: ${d.naofalha_foto}`,`Ciente (Gestor VIVO Rede): ${d.naofalha_gestor}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"transbordo",label:"Transbordo",title:"TRANSBORDO",fields:[{id:"transbordota",label:"TA",type:"text",placeholder:"TA",group:"two"},{id:"transbordocontrato",label:"CONTRATO",type:"text",placeholder:"Contrato",group:"two"},{id:"transbordooperadora",label:"TRANSBORDO",type:"text",value:"VIVO",readonly:true,group:"two"}],stamp:d=>["TRANSBORDO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`TA: ${d.transbordota}`,`CONTRATO: ${d.transbordocontrato}`,`TRANSBORDO: ${d.transbordooperadora}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"prazo",label:"Prazo de Reparo",title:"PRAZO DE REPARO",fields:[{id:"prazoreparocargo",label:"Cargo",type:"text",value:"Coordenador",readonly:true,group:"two"},{id:"prazoreparonometel",label:"Nome / Telefone",type:"text",value:"João Andrioli / 41 99244-9441",readonly:true,group:"two"},{id:"prazoreparosla",label:"SLA do evento",type:"text",placeholder:"Ex: 4h, 2h",group:"two"},{id:"prazoreparoobs",label:"Observações",type:"text",placeholder:"Observações",group:"two"}],stamp:d=>["ESCALONAMENTO PRAZO REPARO","",`ID Ocorrência: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Cargo: ${d.prazoreparocargo}`,`Nome/Tel.: ${d.prazoreparonometel}`,`SLA do evento: ${d.prazoreparosla}`,`Obs.: ${d.prazoreparoobs}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"cire",label:"CIRE",title:"INTERVENÇÃO CIRE",fields:[{id:"cire_solicitante",label:"Solicitante",type:"text",placeholder:"Nome do Solicitante",group:"two"},{id:"cire_contato",label:"Meio de contato",type:"radio",name:"cire_contato",options:["Telefone","E-mail","WhatsApp"],group:"two"},{id:"cire_motivo",label:"Motivo",type:"textarea",placeholder:"Descreva o motivo da intervenção CIRE",group:"full"},{id:"cire_info",label:"Informação",type:"textarea",placeholder:"Informações adicionais",group:"full"},{id:"cire_previsao",label:"Previsão",type:"time",group:"two"}],stamp:d=>["INTERVENÇÃO CIRE","",`ID Ocorrência: ${d.id_ocorrencia}`,`Solicitante: ${d.cire_solicitante}`,`Meio de contato: ${d.cire_contato}`,`Motivo: ${d.cire_motivo}`,`Informação: ${d.cire_info}`,`Previsão: ${d.cire_previsao}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"escalonamento",label:"Escalonamento sem Equipe",title:"ESCALONAMENTO SEM EQUIPE",fields:[{id:"escalonamento_cargo",label:"Cargo",type:"text",value:"Coordenador",readonly:true,group:"two"},{id:"escalonamento_nome_tel",label:"Nome / Telefone",type:"text",value:"João Andrioli / 41 99244-9441",readonly:true,group:"two"},{id:"escalonamento_sla",label:"SLA do evento",type:"text",placeholder:"Ex: 4h, 2h",group:"two"},{id:"escalonamento_obs",label:"Observações",type:"text",placeholder:"Observações",group:"two"}],stamp:d=>["ESCALONAMENTO SEM EQUIPE","",`ID Ocorrência: ${d.id_ocorrencia}`,`Cargo: ${d.escalonamento_cargo}`,`Nome/Tel.: ${d.escalonamento_nome_tel}`,`SLA do evento: ${d.escalonamento_sla}`,`Obs.: ${d.escalonamento_obs}`,`Analista CCR: ${d.analista_ccr}`]},
+  {id:"cto_defeito",label:"CTO com Defeito",title:"CTO COM DEFEITO",fields:[{id:"cto_defeito_site",label:"Nome SITE/ARO",type:"datalist",listId:"siteList",listFrom:"sites",placeholder:"Digite para pesquisar",group:"two"},{id:"cto_defeito_splitter",label:"Splitter",type:"text",placeholder:"Ex: SP001, SP144",group:"two"},{id:"cto_defeito_caixa",label:"Caixa",type:"text",placeholder:"Ex: G0001, G0099, GP0050",group:"two"},{id:"cto_defeito_endereco",label:"Endereço",type:"text",placeholder:"Rua, Número, Complemento",group:"two"},{id:"cto_defeito_causa",label:"Causa",type:"select",optionsFrom:"causes",group:"two"},{id:"cto_defeito_tratativa",label:"Tratativa realizada",type:"textarea",placeholder:"Descreva a tratativa realizada",group:"full"},{id:"cto_defeito_material",label:"Materiais Utilizados",type:"materials",group:"full"}],stamp:d=>{
+    const mats=JSON.parse(d.cto_defeito_material||"[]");
+    const ml=mats.length?["Materiais utilizados:",...mats.map(m=>`  - ${m.name}: ${m.quantity} ${m.unit} (${m.code})`)]
+      :["Nenhum material registrado"];
+    return["CTO COM DEFEITO","",`OS BA/TT: ${d.id_ocorrencia}`,`Supervisor: ${d.supervisor}`,`Telefone: ${d.supervisor_tel}`,`Técnicos(s): ${d.tecnicos}`,`Telefone: ${d.tecnico_tel}`,`Nome SITE/ARO: ${d.cto_defeito_site}`,`Splitter: ${d.cto_defeito_splitter}`,`Caixa: ${d.cto_defeito_caixa}`,`Endereço: ${d.cto_defeito_endereco}`,`Causa: ${d.cto_defeito_causa}`,`Tratativa realizada: ${d.cto_defeito_tratativa}`,...ml,`Analista CCR: ${d.analista_ccr}`]}}
+];
+
+const BASE_FIELDS=[
+  {id:"id_ocorrencia",label:"Ocorrência/Porta CTO (BA/TT)",type:"text",placeholder:"Ex: 123456",group:"two"},
+  {id:"carimbo_tipo",label:"Selecione o Tipo de Carimbo",type:"select",optionsFrom:"types",group:"two"},
+  {id:"supervisor",label:"Supervisor",type:"datalist",listId:"supervisorList",listFrom:"supervisors",placeholder:"Nome do Supervisor",group:"two"},
+  {id:"supervisor_tel",label:"Telefone Supervisor",type:"hidden",group:"two"},
+  {id:"tecnicos",label:"Técnicos(s)",type:"tags",listId:"tecnicoList",listFrom:"technicians",placeholder:"Comece a digitar para pesquisar",group:"two"},
+  {id:"tecnico_tel",label:"Telefone Técnico",type:"hidden",group:"two"},
+  {id:"analista_ccr",label:"Analista CCR",type:"datalist",listId:"analistaList",listFrom:"analysts",placeholder:"Digite para pesquisar",group:"full"}
+];
+
+const REQ={
+  acionamento:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","acionamento_prev_chegada","acionamento_site"],
+  deslocamento:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","deslocamento_km","deslocamento_prev_chegada"],
+  recuperacao:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","recuperacao_causa","recuperacao_prev_testes","recuperacao_endereco","recuperacao_cabo","recuperacao_tratativas"],
+  certificacao:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","certificacao_tratativa","certificacao_causa","certificacao_foto","certificacao_geo"],
+  complementar:["id_ocorrencia","complementar_motivo","complementar_info","nova_previsao","complementar_previsao"],
+  naofalha:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","naofalha_motivo","naofalha_foto","naofalha_gestor"],
+  transbordo:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","transbordota","transbordocontrato","transbordooperadora"],
+  prazo:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","prazoreparocargo","prazoreparonometel","prazoreparosla"],
+  cire:["cire_solicitante","cire_contato","cire_motivo","cire_info","cire_previsao"],
+  escalonamento:["id_ocorrencia","escalonamento_cargo","escalonamento_nome_tel","escalonamento_sla"],
+  cto_defeito:["id_ocorrencia","supervisor","supervisor_tel","tecnicos","tecnico_tel","analista_ccr","cto_defeito_site","cto_defeito_splitter","cto_defeito_caixa","cto_defeito_endereco","cto_defeito_causa","cto_defeito_tratativa"]
+};
+
+// ── Local persistence ──
+const setLastCause=c=>localStorage.setItem("lc3",(c||"").trim());
+const getLastCause=()=>(localStorage.getItem("lc3")||"").trim();
+
+// ── Helpers ──
+const norm=s=>(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+const safeHtml=lines=>(lines||[]).map(l=>esc(l)).join("<br>\n").trim();
+const fmtPhone=r=>{const d=String(r||"").replace(/\D/g,"");if(d.length===11)return`(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;if(d.length===10)return`(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;return r||""};
+const gl=k=>(L&&L[k])||[];
+const gc=g=>g==="full"?"form-group full":g==="three"?"form-group three-col":"form-group";
+
+// ── File store ──
+const FS={};
+function regFile(id){const el=$(id);if(el)el.addEventListener("change",()=>{FS[id]=Array.from(el.files||[])})}
+function getFiles(id){return Array.from(FS[id]||[])}
+
+// ── Datalist enforcement ──
+function allowed4(f){if(!f||f.type!=="datalist")return[];if(f.listFrom==="supervisors")return gl("supervisors").map(s=>s.name);return gl(f.listFrom)||[]}
+function inList(v,a){const n=norm(v);return a.some(x=>norm(x)===n)}
+function enforce(fields){(fields||[]).filter(f=>f.type==="datalist").forEach(f=>{const el=$(f.id);if(!el)return;const a=allowed4(f);const chk=()=>{const v=(el.value||"").trim();if(!v)return;if(a.length&&!inList(v,a)){alert(`Selecione um valor da lista para: ${f.label}`);el.value="";if(f.id==="supervisor"){const t=$("supervisor_tel");if(t)t.value=""}}};el.addEventListener("blur",chk);el.addEventListener("change",chk)})}
+
+function buildDL(id,vals){let dl=$(id);if(!dl){dl=document.createElement("datalist");dl.id=id;document.body.appendChild(dl)}const lv=(vals||[]).map(v=>typeof v==="string"?v:v?.name||"");dl.innerHTML=lv.map(v=>`<option value="${esc(v)}"></option>`).join("")}
+
+// ── Render fields ──
+function rf(f){
+  const{id,label,type,placeholder:ph,value:val,readonly:ro,inputmode:im,step:st,listId,listFrom,options,optionsFrom,name,accept,multiple,help}=f;
+  const sid=esc(id),sl=esc(label||""),sro=ro?"readonly":"",sim=im?`inputmode="${esc(im)}"`:"",sst=st?`step="${esc(st)}"`:"",sph=ph?`placeholder="${esc(ph)}"`:"",sv=val!=null?`value="${esc(val)}"`:"";
+  if(type==="textarea")return`<div><label for="${sid}">${sl}</label><textarea id="${sid}" ${sph} ${sro}>${esc(val??"")}</textarea></div>`;
+  if(type==="hidden")return`<div style="display:none"><input type="hidden" id="${sid}" ${sv}/></div>`;
+  if(type==="file"){return`<div><label for="${sid}">${sl}</label><input type="file" id="${sid}" ${accept?`accept="${esc(accept)}"`:""}${multiple?" multiple":""}/>` +(help?`<div class="mini" style="margin-top:4px">${esc(help)}</div>`:"")+`</div>`}
+  if(type==="select"){
+    let os;
+    if(optionsFrom==="types")os=TYPES.map(t=>({v:t.id,t:t.label}));
+    else if(optionsFrom==="causes")os=gl("causes").map(v=>({v,t:v}));
+    else if(optionsFrom)os=(gl(optionsFrom)||[]).map(v=>({v,t:v}));
+    else os=(options||[]).map(v=>({v,t:v}));
+    const first=id==="carimbo_tipo"?`<option value="">-- Selecione --</option>`:`<option value="" disabled selected>Selecione</option>`;
+    return`<div><label for="${sid}">${sl}</label><select id="${sid}">${first}${os.map(o=>`<option value="${esc(o.v)}">${esc(o.t)}</option>`).join("")}</select></div>`;
+  }
+  if(type==="radio"){const rn=name||id;return`<div><label>${sl}</label><div class="checkbox-group">${(options||[]).map(o=>`<label><input type="radio" name="${esc(rn)}" value="${esc(o)}"> ${esc(o)}</label>`).join("")}</div></div>`}
+  if(type==="datalist"){const vs=listFrom==="supervisors"?gl("supervisors").map(s=>s.name):gl(listFrom)||[];buildDL(listId,vs);return`<div><label for="${sid}">${sl}</label><input type="text" id="${sid}" list="${esc(listId)}" ${sph} ${sv} ${sro}/></div>`}
+  if(type==="tags"){buildDL(listId,gl(listFrom)||[]);return`<div><label for="${sid}_input">${sl}</label><div class="tags-wrap" id="${sid}_wrap"><div class="tech-table" id="${sid}_table"></div><div class="tags-row"><input type="text" id="${sid}_input" list="${esc(listId)}" ${sph}/><button type="button" id="${sid}_add" class="btn-copy btn-add">Adicionar</button></div></div><input type="hidden" id="${sid}" value=""/></div>`}
+  if(type==="materials"){const mats=[...(gl("materials")||[])].sort((a,b)=>(a.name||"").localeCompare(b.name||"","pt-BR",{sensitivity:"base"}));const lid=`${id}_datalist`;return`<div><label>${sl}</label><div class="materials-wrap" id="${sid}_wrap"><div class="materials-list" id="${sid}_list"><p class="materials-empty">Nenhum material adicionado</p></div><div class="materials-add"><input type="text" id="${sid}_search" list="${lid}" placeholder="Digite para buscar material..." style="flex:1;min-width:200px;padding:8px;border:1px solid var(--border-2);border-radius:4px;font-size:12px"><datalist id="${lid}">${mats.map(m=>`<option value="${esc(m.name)}"></option>`).join("")}</datalist><input type="number" id="${sid}_qty" placeholder="Qtd" min="0.1" step="0.1"><button type="button" id="${sid}_add_btn" class="btn-copy btn-add">Adicionar</button></div></div><input type="hidden" id="${sid}" value="[]"/></div>`}
+  if(type==="subcause_dynamic")return`<div id="${sid}_wrap" style="display:none"><label for="${sid}">${sl}</label><select id="${sid}" data-depends="${esc(f.dependsOn||"")}"><option value="">-- Selecione a Subcausa --</option></select><div class="mini" id="${sid}_hint" style="margin-top:6px"></div></div>`;
+  const dba=(id==="recuperacao_endereco"||id==="cto_defeito_endereco")?`autocomplete="off"`:"";
+  return`<div><label for="${sid}">${sl}</label><input type="${esc(type||"text")}" id="${sid}" ${sph} ${sv} ${sro} ${sim} ${sst} ${dba}/></div>`;
+}
+
+function renderForm(fields){const rows=[];let buf=[],cg=null;const flush=g=>{if(buf.length){rows.push(`<div class="${gc(g)}">${buf.join("")}</div>`);buf=[]}};for(const f of fields){const g=f.group||"two";if(cg===null)cg=g;if(g!==cg){flush(cg);cg=g}buf.push(rf(f))}flush(cg);return rows.join("")}
+
+// ── Collect values ──
+const chk=n=>document.querySelector(`input[name="${CSS.escape(n)}"]:checked`)?.value||"";
+const val=id=>{const el=$(id);if(!el)return"";return el.tagName==="SELECT"?el.value||"":(el.value??"").toString()};
+function collect(td){const d={};for(const f of BASE_FIELDS){d[f.id]=f.type==="radio"?chk(f.name||f.id):val(f.id).trim()}for(const f of(td?.fields||[])){d[f.id]=f.type==="radio"?chk(f.name||f.id):val(f.id).trim()}return d}
+
+// ── Output ──
+function hideOut(){$("output").classList.remove("active");$("outputText").innerHTML="";$("successMsg").classList.remove("show");const db=$("dbMsg");db.className="db-msg";db.textContent=""}
+function showOut(h){$("outputText").innerHTML=h;$("output").classList.add("active");$("output").scrollIntoView({behavior:"smooth"})}
+
+function clearFields(td){if(!td)return;for(const f of td.fields){if(f.readonly)continue;if(f.type==="radio"){document.querySelectorAll(`input[name="${CSS.escape(f.name||f.id)}"]`).forEach(r=>r.checked=false);continue}const el=$(f.id);if(!el)continue;if(f.type==="materials"){el.value="[]";el.__clear&&el.__clear();continue}if(f.type==="tags"){el.value="";el.__clear&&el.__clear();continue}el.tagName==="SELECT"?el.selectedIndex=0:el.value=""}hideOut()}
+
+// ── Geo ──
+function fmtDT(ts=Date.now()){try{return new Date(ts).toLocaleString("pt-BR",{hour12:false})}catch{return new Date().toISOString()}}
+function getGeo(){return new Promise(r=>{if(!("geolocation" in navigator))return r("indisponível");navigator.geolocation.getCurrentPosition(p=>{const{latitude:la,longitude:lo,accuracy:ac}=p.coords||{};if(la==null)return r("indisponível");r(`${la.toFixed(6)}, ${lo.toFixed(6)}${ac!=null?` ±${Math.round(ac)}m`:""} | ${fmtDT()}`)},()=>r("indisponível"),{enableHighAccuracy:true,timeout:8000,maximumAge:0})})}
+
+// ── Address helper ──
+function initAddr(td){if(!td?.fields)return;td.fields.filter(f=>["recuperacao_endereco","cto_defeito_endereco"].includes(f.id)).forEach(fld=>{setTimeout(()=>{const inp=$(fld.id);if(!inp)return;const w=document.createElement("div");w.className="suggest-box";inp.parentNode.insertBefore(w,inp);w.appendChild(inp);const d=document.createElement("div");d.style.cssText="display:flex;gap:8px;margin-top:6px";const b=document.createElement("button");b.type="button";b.className="btn-copy";b.style.padding="6px 10px";b.textContent="🔎 Buscar no mapa";b.addEventListener("click",()=>{const q=inp.value;if(!q.trim())return alert("Digite um endereço.");window.open("https://www.google.com/maps/search/"+encodeURIComponent(q),"_blank")});d.appendChild(b);w.appendChild(d)},0)})}
+
+// ── Subcause dynamic ──
+function initSubcause(td){
+  (td?.fields||[]).filter(f=>f.type==="subcause_dynamic").forEach(f=>{
+    const sel=$(f.id),wrap=$(`${f.id}_wrap`),hint=$(`${f.id}_hint`),cEl=$(f.dependsOn);
+    if(!sel||!wrap||!cEl)return;
+    if(td.id==="certificacao"&&!cEl.value&&getLastCause())cEl.value=getLastCause();
+    const refresh=()=>{const c=(cEl.value||"").trim()||getLastCause();const sc=(L?.subcauses||{})[c]||[];if(!c||!sc.length){wrap.style.display="none";sel.innerHTML=`<option value="">-- Selecione --</option>`;if(hint)hint.textContent=c?`Causa: ${c} (sem subcausa)`:"";return}sel.innerHTML=`<option value="">-- Selecione --</option>`+sc.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join("");wrap.style.display="block";if(hint)hint.textContent=`Causa: ${c}`};
+    cEl.addEventListener("change",refresh);refresh();
+  });
+}
+
+// ── Validate ──
+function validate(td,d){
+  const labs=new Map();BASE_FIELDS.forEach(f=>labs.set(f.id,f.label||f.id));td.fields.forEach(f=>labs.set(f.id,f.label||f.id));
+  const miss=[];(REQ[td.id]||[]).forEach(id=>{if(!(d[id]??"").toString().trim())miss.push(labs.get(id)||id)});
+  if(td.id==="certificacao"){
+    const g=(d.certificacao_geo||"").trim();if(!g||g.includes("indisponível")||!/-?\d+\.\d+\s*,\s*-?\d+\.\d+/.test(g))if(!miss.includes("Geolocalização (GPS)"))miss.push("Geolocalização (GPS)");
+    const c=(d.certificacao_causa||"").trim()||getLastCause();if(!c&&!miss.includes("Causa"))miss.push("Causa");
+    if(c&&((L?.subcauses||{})[c]||[]).length&&!(d.certificacao_subcausa||"").trim()&&!miss.includes("Subcausa"))miss.push("Subcausa");
+  }
+  [...BASE_FIELDS,...td.fields].filter(f=>f.type==="datalist").forEach(f=>{const v=(d[f.id]||"").trim();if(!v)return;const a=allowed4(f);if(a.length&&!inList(v,a)){const l=f.label||f.id;if(!miss.includes(l))miss.push(l+" (selecione da lista)")}});
+  return miss;
+}
+
+// ── Save to DB ──
+async function saveDB(td,d,txt){
+  const el=$("dbMsg");
+  try{
+    let gLat=null,gLng=null,gAcc=null;const g=d.certificacao_geo||"";
+    const cm=g.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);if(cm){gLat=+cm[1];gLng=+cm[2]}
+    const am=g.match(/±\s*(\d+(?:\.\d+)?)\s*m/i);if(am)gAcc=+am[1];
+    const r=await api("/stamps",{method:"POST",body:JSON.stringify({tipo:td.id,id_ocorrencia:d.id_ocorrencia||null,supervisor:d.supervisor||null,tecnicos:d.tecnicos||null,analista_ccr:d.analista_ccr||null,texto_gerado:txt,dados_formulario:d,geo_lat:gLat,geo_lng:gLng,geo_accuracy:gAcc})});
+    const j=await r.json();
+    if(r.ok){el.textContent=`✅ Salvo no banco (ID: ${j.id})`;el.className="db-msg ok"}
+    else throw new Error(j.error||"Erro");
+  }catch(e){el.textContent=`⚠️ Erro ao salvar: ${e.message}`;el.className="db-msg err"}
+}
+
+// ── Render dynamic section ──
+function renderDyn(typeId){
+  const root=$("dynamicRoot");root.innerHTML="";
+  if(!typeId){root.innerHTML=`<div class="section"><div class="hint">Selecione um tipo de carimbo acima para ver os campos específicos.</div></div>`;hideOut();return}
+  const td=TYPES.find(t=>t.id===typeId);if(!td)return;
+  root.innerHTML=`<div class="section"><div class="section-title">${esc(td.title)}</div>${renderForm(td.fields)}<div class="actions"><button class="btn-generate" id="btnGen">Gerar Carimbo</button><button class="btn-clear" id="btnClr">Limpar Formulário</button></div></div>`;
+
+  $("btnGen").addEventListener("click",async()=>{
+    let d=collect(td);
+    if(td.id==="recuperacao")setLastCause(d.recuperacao_causa||"");
+    if(td.id==="certificacao"){try{d.certificacao_geo=await getGeo()}catch{d.certificacao_geo="indisponível"}}
+    const miss=validate(td,d);
+    if(miss.length){alert("Preencha os campos obrigatórios:\n\n- "+miss.join("\n- "));hideOut();return}
+    const lines=td.stamp(d);showOut(safeHtml(lines));
+    saveDB(td,d,lines.join("\n"));
+  });
+
+  $("btnClr").addEventListener("click",()=>clearFields(td));
+
+  setTimeout(()=>{
+    td.fields.forEach(f=>{if(f.type==="materials")initMat(f.id);if(f.type==="file")regFile(f.id)});
+    enforce(td.fields);initAddr(td);initSubcause(td);
+    if(td.id==="recuperacao"){const el=$("recuperacao_causa");if(el)el.addEventListener("change",()=>setLastCause(el.value||""))}
+  },0);
+}
+
+// ── Techs table ──
+function initTechs(fid){
+  const inp=$(`${fid}_input`),btn=$(`${fid}_add`),tw=$(`${fid}_table`),hid=$(fid);
+  if(!inp||!btn||!tw||!hid)return;
+  const st={items:[]};
+  const sync=()=>{hid.value=st.items.map(x=>x.name).join(" / ")};
+  const syncPh=()=>{const t=$("tecnico_tel");if(t)t.value=st.items[0]?fmtPhone(st.items[0].phone):""};
+  const render=()=>{tw.innerHTML="";if(!st.items.length){tw.innerHTML=`<div class="muted">Nenhum técnico adicionado</div>`;return}const tb=document.createElement("table");const h=tb.insertRow();["MATRÍCULA","COLABORADOR",""].forEach(t=>{const th=document.createElement("th");th.textContent=t;h.appendChild(th)});st.items.forEach((it,i)=>{const r=tb.insertRow();r.insertCell().textContent=it.matricula||"";r.insertCell().textContent=it.name||"";const c=r.insertCell();c.style.textAlign="center";const b=document.createElement("button");b.type="button";b.className="btn-x";b.textContent="✕";b.addEventListener("click",()=>{st.items.splice(i,1);sync();syncPh();render()});c.appendChild(b)});tw.appendChild(tb)};
+  const add=()=>{const raw=(inp.value||"").trim();if(!raw)return;const dir=gl("techDirectory")||[];const rec=dir.find(t=>norm(t.name)===norm(raw))||dir.find(t=>t.matricula===raw)||dir.find(t=>(t.phone||"").replace(/\D/g,"")===raw.replace(/\D/g,""));if(!rec){alert("Colaborador não encontrado. Selecione da lista.");return}const k=rec.matricula;if(st.items.some(x=>x.matricula===k)){inp.value="";return}st.items.push({name:rec.name,phone:rec.phone,matricula:rec.matricula});inp.value="";sync();syncPh();render();inp.focus()};
+  btn.addEventListener("click",add);inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();add()}if(e.key==="Backspace"&&!inp.value&&st.items.length){st.items.pop();sync();syncPh();render()}});
+  hid.__clear=()=>{st.items=[];sync();syncPh();render()};sync();syncPh();render();
+}
+
+// ── Materials ──
+function initMat(fid){
+  const si=$(`${fid}_search`),qty=$(`${fid}_qty`),btn=$(`${fid}_add_btn`),list=$(`${fid}_list`),hid=$(fid);
+  if(!si||!qty||!btn||!list||!hid)return;
+  const st={items:[]};
+  const sync=()=>{hid.value=JSON.stringify(st.items)};
+  const render=()=>{list.innerHTML="";if(!st.items.length){list.innerHTML=`<p class="materials-empty">Nenhum material adicionado</p>`;return}const tb=document.createElement("table");const h=tb.insertRow();["Material","Qtd","Un",""].forEach(t=>{const th=document.createElement("th");th.textContent=t;h.appendChild(th)});st.items.forEach((it,i)=>{const r=tb.insertRow();r.insertCell().textContent=it.name;r.insertCell().textContent=it.quantity;r.insertCell().textContent=it.unit;const c=r.insertCell();c.style.textAlign="center";const b=document.createElement("button");b.type="button";b.textContent="✕";b.style.cssText="background:transparent;border:none;cursor:pointer;color:var(--accent);font-weight:700";b.addEventListener("click",()=>{st.items.splice(i,1);sync();render()});c.appendChild(b)});list.appendChild(tb)};
+  const add=()=>{const mk=si.value.trim(),q=parseFloat(qty.value);if(!mk||!q||q<=0){alert("Informe material e quantidade.");return}const mats=gl("materials")||[];const md=mats.find(m=>m.name===mk)||mats.find(m=>m.code===mk);if(!md){alert("Material não encontrado.");return}st.items.push({name:md.name,quantity:q,unit:md.unit,code:md.code});si.value="";qty.value="";sync();render();si.focus()};
+  btn.addEventListener("click",add);qty.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();add()}});
+  hid.__clear=()=>{st.items=[];sync();render()};sync();render();
+}
+
+// ── Clipboard / WhatsApp ──
+async function doCopy(){const t=$("outputText").innerText||"";if(!t.trim())return alert("Nenhum carimbo gerado.");try{await navigator.clipboard.writeText(t)}catch{const ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;left:-9999px";document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove()}$("successMsg").classList.add("show");setTimeout(()=>$("successMsg").classList.remove("show"),3000)}
+function doWhats(){const t=$("outputText").innerText||"";if(!t.trim())return alert("Nenhum carimbo gerado.");const tid=$("carimbo_tipo")?.value||"";const files=tid==="certificacao"?getFiles("certificacao_anexos"):[];if(files.length&&navigator.share&&navigator.canShare){try{if(navigator.canShare({files})){navigator.share({title:"Carimbo",text:t,files}).catch(()=>window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank"));return}}catch{}}window.open("https://wa.me/?text="+encodeURIComponent(t),"_blank");if(files.length)setTimeout(()=>alert("⚠️ Anexe manualmente os arquivos selecionados."),300)}
+
+// ── History ──
+async function loadHist(pg=1,tipo="",oc=""){
+  const body=$("histBody"),pages=$("histPages");body.innerHTML=`<div class="hempty">Carregando...</div>`;pages.innerHTML="";
+  try{
+    let url=`/stamps?page=${pg}&limit=20`;if(tipo)url+=`&tipo=${encodeURIComponent(tipo)}`;if(oc)url+=`&id_ocorrencia=${encodeURIComponent(oc)}`;
+    const r=await api(url);const d=await r.json();if(!r.ok)throw new Error(d.error);
+    const{carimbos:rows,pagination:p}=d;
+    if(!rows.length){body.innerHTML=`<div class="hempty">Nenhum carimbo encontrado.</div>`;return}
+    let h=`<table class="htable"><thead><tr><th>ID</th><th>Tipo</th><th>Ocorrência</th><th>Supervisor</th><th>Analista</th><th>Data</th><th>Prévia</th></tr></thead><tbody>`;
+    rows.forEach(c=>{const dt=new Date(c.created_at).toLocaleString("pt-BR",{hour12:false});const pv=(c.texto_gerado||"").substring(0,80)+"...";h+=`<tr><td>${c.id}</td><td>${esc(c.tipo)}</td><td>${esc(c.id_ocorrencia||"-")}</td><td>${esc(c.supervisor||"-")}</td><td>${esc(c.analista_ccr||"-")}</td><td>${dt}</td><td class="prev" title="${esc(c.texto_gerado)}">${esc(pv)}</td></tr>`});
+    h+=`</tbody></table>`;body.innerHTML=h;
+    if(p.pages>1){let ph="";for(let i=1;i<=p.pages&&i<=10;i++)ph+=`<button class="${i===p.page?"cur":""}" data-p="${i}">${i}</button>`;pages.innerHTML=ph;pages.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>loadHist(+b.dataset.p,tipo,oc)))}
+  }catch(e){body.innerHTML=`<div class="hempty">Erro: ${e.message}</div>`}
+}
+function openHist(){$("histModal").classList.add("show");const s=$("hfTipo");s.innerHTML=`<option value="">Todos</option>`+TYPES.map(t=>`<option value="${t.id}">${esc(t.label)}</option>`).join("");loadHist()}
+function closeHist(){$("histModal").classList.remove("show")}
+
+// ── Init ──
+function initBase(){
+  buildDL("supervisorList",gl("supervisors").map(s=>s.name));
+  buildDL("analistaList",gl("analysts"));
+  buildDL("tecnicoList",gl("technicians"));
+  buildDL("siteList",gl("sites"));
+  $("baseForm").innerHTML=renderForm(BASE_FIELDS);
+  enforce(BASE_FIELDS);
+  initTechs("tecnicos");
+  $("carimbo_tipo").addEventListener("change",e=>renderDyn(e.target.value));
+  const supPh={};gl("supervisors").forEach(s=>{supPh[norm(s.name)]=s.phone});
+  $("supervisor").addEventListener("input",function(){$("supervisor_tel").value=supPh[norm(this.value)]||""});
+  $("btnCopy").addEventListener("click",doCopy);
+  $("btnWhats").addEventListener("click",doWhats);
+  renderDyn($("carimbo_tipo").value);
+}
+
+// ── Boot ──
+document.addEventListener("DOMContentLoaded",()=>{
+  $("btnLogin").addEventListener("click",doLogin);
+  $("pw").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+  $("btnLogout").addEventListener("click",()=>{clearToken();L=null;showLogin()});
+  $("btnHist").addEventListener("click",openHist);
+  $("histClose").addEventListener("click",closeHist);
+  $("histModal").addEventListener("click",e=>{if(e.target===$("histModal"))closeHist()});
+  $("hfGo").addEventListener("click",()=>loadHist(1,$("hfTipo").value,$("hfOc").value.trim()));
+  getToken()?boot():showLogin();
+});
+</script>
+</body>
+</html>
