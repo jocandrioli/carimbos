@@ -70,6 +70,10 @@ const LISTS = {
     { phone:"51 99531-1546", matricula:"00176278", name:"Luiz A. Fagundes" },
     { phone:"51 99913-3576", matricula:"00176316", name:"Marcelo B. Conforti" },
     { phone:"51 99898-1482", matricula:"00176391", name:"Deivide R. Silva" },
+    { phone:"51 99587-8094", matricula:"00074649", name:"Denis R. L. Vogel" },
+    { phone:"51 99586-5085", matricula:"00176386", name:"Diego D. Santos" },
+    { phone:"51 99630-0788", matricula:"00176813", name:"Paulo R. Soares" },
+    { phone:"51 99745-1232", matricula:"00176379", name:"Regis R. Pereira" },
     { phone:"51 99996-0999", matricula:"00176258", name:"Oldonir A. A. Silva" }
   ],
   sites: ["RSCBM_G1N01","RSCBM_O1A01","RSGUB_G1N01","RSNHO_G1I02","RSPAE_G1B95","RSPAE_G1C01","RSPAE_G1I22","RSPAE_G1I23","RSPAE_G1I24","RSPAE_G1I25","RSPAE_G1I26","RSPAE_G1I32","RSPAE_G1I33","RSPAE_G1I35","RSPAE_G1I41","RSPAE_G1I47","RSPAE_G1I48","RSPAE_G1I51","RSPAE_G1I55","RSPAE_G1I57","RSPAE_G1N42","RSPAE_G1N45","RSSLE_G1M01","RSSLE_O1A04"],
